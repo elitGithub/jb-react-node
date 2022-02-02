@@ -1,0 +1,38 @@
+export const DUMMY_VACATIONS = [
+    {
+        id: '1',
+        name: 'Rome',
+        description: 'A weekend in Rome...',
+        image: "https://c0.wallpaperflare.com/preview/483/210/436/car-green-4x4-jeep.jpg",
+        dates: '31/12/2021 - 02/01/2022',
+        price: 22.99,
+        followers: 55,
+    },
+    {
+        id: '2',
+        name: 'Venice',
+        description: 'A lovely ride through the city on water!',
+        image: "https://c0.wallpaperflare.com/preview/483/210/436/car-green-4x4-jeep.jpg",
+        dates: '31/12/2021 - 02/01/2022',
+        price: 16.5,
+        followers: 26,
+    },
+    {
+        id: '3',
+        name: 'Prague',
+        description: 'European and fun',
+        image: "https://c0.wallpaperflare.com/preview/483/210/436/car-green-4x4-jeep.jpg",
+        dates: '31/12/2021 - 02/01/2022',
+        price: 12.99,
+        followers: 468,
+    },
+    {
+        id: '4',
+        name: 'Prague',
+        description: 'A night of stars...',
+        image: "https://c0.wallpaperflare.com/preview/483/210/436/car-green-4x4-jeep.jpg",
+        dates: '31/12/2021 - 02/01/2022',
+        price: 18.99,
+        followers: 1,
+    },
+];
