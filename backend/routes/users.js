@@ -4,7 +4,8 @@ const path = require('path');
 const usersController = require("../controllers/usersController");
 
 router.route('/login(.html)?')
-    .post((req, res) => usersController.login());
+    .get((req, res) => usersController.login(req, res))
+    .post((req, res) => usersController.login(req, res));
 
 router.route('/register(.html)?')
     .get()

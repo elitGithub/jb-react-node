@@ -14,10 +14,11 @@ const initialStateValue = {
 
 export const register = createAsyncThunk('users/register', async (user, thunk) => {
     try {
-        const res = await UsersService.register({ email: user.email, password: user.password, firstName: user.firstName, lastName: user.lastName });
-        const data = res.data;
+        const res = await UsersService.register({ userName: user.email, password: user.password, firstName: user.firstName, lastName: user.lastName });
+        const token = await res.data.token;
         if (res.hasOwnProperty('success') && res.success === true) {
-            return data;
+            user.token = token;
+            return user;
         } else {
             return thunk.rejectWithValue(res.hasOwnProperty('message') ? res.message : 'An error occurred during registration.');
         }
@@ -90,6 +91,7 @@ export const userSlice = createSlice({
                 state.pending = null;
                 state.error = false;
                 state.value = action.payload;
+                loginPromiseFulfilled(state, action.payload);
             })
             .addCase(login.pending, (state) => {
                 state.status = 'loading';
@@ -111,13 +113,16 @@ export const userSlice = createSlice({
 });
 
 const loginPromiseFulfilled = (state, userData) => {
-    state.status = 'idle';
-    state.pending = null;
-    state.error = false;
-    state.value = userData;
-    state.value.loggedIn = userData.hasOwnProperty('token') && userData.token.length > 0;
-    if (state.value.loggedIn) {
-        localStorage.setItem('token', userData.token);
+    if (userData) {
+        state.status = 'idle';
+        state.pending = null;
+        state.error = false;
+        state.value = userData;
+        state.value.isAdmin = true;
+        state.value.loggedIn = userData.hasOwnProperty('token') && userData.token.length > 0;
+        if (state.value.loggedIn) {
+            localStorage.setItem('token', userData.token);
+        }
     }
 }
 

@@ -21,7 +21,7 @@ app.use(session({
 app.use(requestLogger);
 app.use(passport.initialize());
 app.use(passport.session());
-const whiteList = ['http://127.0.0.1:3000', 'http://127.0.0.1', 'http://localhost:3500', 'http://localhost:3000'];
+const whiteList = ['http://127.0.0.1:3000', 'http://127.0.0.1', 'http://localhost:3500', 'http://localhost:3000', 'http://localhost:3001'];
 const corsOptions = {
     origin: (origin, callback) => {
         if (whiteList.includes(origin) || !origin) {
@@ -30,6 +30,7 @@ const corsOptions = {
             callback(new Error('Blocked by CORS policy.'));
         }
     },
+    credentials: true,
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));

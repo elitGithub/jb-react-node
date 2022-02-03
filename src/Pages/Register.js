@@ -5,7 +5,7 @@ import { validateAlphanumeric, validateAndMatchPasswords, validatePassword, vali
 import { faCheck, faInfoCircle, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useDispatch, useSelector } from "react-redux";
-import { register, login } from "../features/user";
+import { register } from "../features/user";
 
 const Register = () => {
     const user = useSelector((state) => state.user.value);
@@ -88,23 +88,11 @@ const Register = () => {
             lastName: lastName,
             email: email,
             password: password,
-            loggedIn: true,
-            isAdmin: false,
         }));
-
-        console.log('resUser', resUser);
-
-        if (resUser.meta.requestStatus === 'fulfilled') {
-            const loginSuccess = await dispatch(login(resUser.payload));
-            if (loginSuccess.meta.requestStatus === 'rejected') {
-                setErrMessage(loginSuccess.payload ? loginSuccess.payload : 'Error occurred' );
-            } else if (loginSuccess.meta.requestStatus === 'fulfilled') {
-                setRedirect(loginSuccess.payload.success);
-            }
-        } else if(resUser.meta.requestStatus === 'rejected') {
-            setErrMessage(resUser.payload);
+        if (resUser.meta.requestStatus === 'rejected') {
+            setErrMessage(resUser.payload.message ? resUser.payload.message : 'An Error occurred');
             errRef.current.focus();
-        } else {
+        } else if (!resUser.meta.requestStatus) {
             setErrMessage('Registration failed');
             errRef.current.focus();
             setRedirect(false);
@@ -112,113 +100,116 @@ const Register = () => {
     };
 
     return (<Fragment>
-        {redirect && <Navigate to="/" />}
-        <form onSubmit={handleSubmit} className="form">
-            <p ref={errRef} className={errMessage ? "errorMessage" : "offScreen"}
-               aria-live="assertive">{errMessage}</p>
+        { redirect && <Navigate to="/"/> }
+        <form onSubmit={ handleSubmit } className="form">
+            <p ref={ errRef } className={ errMessage ? "errorMessage" : "offScreen" }
+               aria-live="assertive">{ errMessage }</p>
             <h2>Register</h2>
 
-            <div className={classes['input-parent']}>
+            <div className={ classes['input-parent'] }>
                 <label htmlFor="username">Username:
-                    <FontAwesomeIcon icon={faCheck} className={validEmail ? classes.valid : classes.hide}/>
-                    <FontAwesomeIcon icon={faTimes} className={validEmail || !email ? classes.hide : classes.invalid}/>
+                    <FontAwesomeIcon icon={ faCheck } className={ validEmail ? classes.valid : classes.hide }/>
+                    <FontAwesomeIcon icon={ faTimes }
+                                     className={ validEmail || !email ? classes.hide : classes.invalid }/>
                 </label>
                 <input type="email"
                        id="username"
                        inputMode="email"
-                       ref={emailRef}
+                       ref={ emailRef }
                        autoComplete="off"
-                       onChange={(e) => {
+                       onChange={ (e) => {
                            setEmail(e.target.value)
-                       }}
+                       } }
                        required
-                       aria-invalid={validEmail ? "false" : "true"}
+                       aria-invalid={ validEmail ? "false" : "true" }
                        aria-describedby="uidnote"
                        name="username"
-                       value={email}
-                       onFocus={() => setEmailFocus(true)}
-                       onBlur={() => setEmailFocus(false)}/>
+                       value={ email }
+                       onFocus={ () => setEmailFocus(true) }
+                       onBlur={ () => setEmailFocus(false) }/>
                 <p id="uidnote"
-                   className={emailFocus && email && !validEmail ? classes.instructions : "offScreen"}>
-                    <FontAwesomeIcon icon={faInfoCircle}/>
+                   className={ emailFocus && email && !validEmail ? classes.instructions : "offScreen" }>
+                    <FontAwesomeIcon icon={ faInfoCircle }/>
                     Must be a valid email address.
                 </p>
             </div>
 
-            <div className={classes['input-parent']}>
+            <div className={ classes['input-parent'] }>
                 <label htmlFor="firstName">First Name:
-                    <FontAwesomeIcon icon={faCheck} className={validFirstName ? classes.valid : classes.hide}/>
-                    <FontAwesomeIcon icon={faTimes} className={validFirstName || !firstName ? classes.hide : classes.invalid}/>
+                    <FontAwesomeIcon icon={ faCheck } className={ validFirstName ? classes.valid : classes.hide }/>
+                    <FontAwesomeIcon icon={ faTimes }
+                                     className={ validFirstName || !firstName ? classes.hide : classes.invalid }/>
                 </label>
                 <input
                     type="text"
                     id="firstName"
                     name="firstName"
-                    value={firstName || ""}
+                    value={ firstName || "" }
                     required
-                    onInput={(e) => {
+                    onInput={ (e) => {
                         setFirstName(e.target.value)
-                    }}
-                    aria-invalid={validFirstName ? "false" : "true"}
+                    } }
+                    aria-invalid={ validFirstName ? "false" : "true" }
                     aria-describedby="fnamenote"
-                    onFocus={() => setFirstNameFocus(true)}
-                    onBlur={() => setFirstNameFocus(false)}
+                    onFocus={ () => setFirstNameFocus(true) }
+                    onBlur={ () => setFirstNameFocus(false) }
                 />
                 <p id="fnamenote"
-                   className={firstNameFocus && firstName && !validFirstName ? classes.instructions : "offScreen"}>
-                    <FontAwesomeIcon icon={faInfoCircle}/>
+                   className={ firstNameFocus && firstName && !validFirstName ? classes.instructions : "offScreen" }>
+                    <FontAwesomeIcon icon={ faInfoCircle }/>
                     Must be alphanumeric.
                 </p>
 
             </div>
-            <div className={classes['input-parent']}>
+            <div className={ classes['input-parent'] }>
                 <label htmlFor="lastName">Last Name:
-                    <FontAwesomeIcon icon={faCheck} className={validLastName ? classes.valid : classes.hide}/>
-                    <FontAwesomeIcon icon={faTimes} className={validLastName || !lastName ? classes.hide : classes.invalid}/>
+                    <FontAwesomeIcon icon={ faCheck } className={ validLastName ? classes.valid : classes.hide }/>
+                    <FontAwesomeIcon icon={ faTimes }
+                                     className={ validLastName || !lastName ? classes.hide : classes.invalid }/>
                 </label>
                 <input
                     type="text"
                     name="lastName"
                     id="lastName"
-                    value={lastName || ""}
-                    onInput={(e) => {
+                    value={ lastName || "" }
+                    onInput={ (e) => {
                         setLastName(e.target.value)
-                    }}
+                    } }
                     required
-                    aria-invalid={validLastName ? "false" : "true"}
+                    aria-invalid={ validLastName ? "false" : "true" }
                     aria-describedby="lnamenote"
-                    onFocus={() => setLastNameFocus(true)}
-                    onBlur={() => setLastNameFocus(false)}
+                    onFocus={ () => setLastNameFocus(true) }
+                    onBlur={ () => setLastNameFocus(false) }
                 />
                 <p id="lnamenote"
-                   className={lastNameFocus && lastName && !validLastName ? classes.instructions : "offScreen"}>
-                    <FontAwesomeIcon icon={faInfoCircle}/>
+                   className={ lastNameFocus && lastName && !validLastName ? classes.instructions : "offScreen" }>
+                    <FontAwesomeIcon icon={ faInfoCircle }/>
                     Must be alphanumeric.
                 </p>
             </div>
 
-            <div className={classes['input-parent']}>
+            <div className={ classes['input-parent'] }>
                 <label htmlFor="password">Password:
-                    <FontAwesomeIcon icon={faCheck} className={validPassword ? classes.valid : classes.hide}/>
-                    <FontAwesomeIcon icon={faTimes}
-                                     className={validPassword || !password ? classes.hide : classes.invalid}/>
+                    <FontAwesomeIcon icon={ faCheck } className={ validPassword ? classes.valid : classes.hide }/>
+                    <FontAwesomeIcon icon={ faTimes }
+                                     className={ validPassword || !password ? classes.hide : classes.invalid }/>
                 </label>
                 <input
                     type="password"
                     id="password"
-                    value={password}
-                    onInput={(e) => {
+                    value={ password }
+                    onInput={ (e) => {
                         setPassword(e.target.value)
-                    }}
+                    } }
                     required
-                    aria-invalid={validPassword ? "false" : "true"}
+                    aria-invalid={ validPassword ? "false" : "true" }
                     aria-describedby="pwdnote"
-                    onFocus={() => setPasswordFocus(true)}
-                    onBlur={() => setPasswordFocus(false)}
+                    onFocus={ () => setPasswordFocus(true) }
+                    onBlur={ () => setPasswordFocus(false) }
                 />
                 <p id="pwdnote"
-                   className={passwordFocus && !validPassword ? classes.instructions : "offScreen"}>
-                    <FontAwesomeIcon icon={faInfoCircle}/>
+                   className={ passwordFocus && !validPassword ? classes.instructions : "offScreen" }>
+                    <FontAwesomeIcon icon={ faInfoCircle }/>
                     At least 7 characters long.
                     Must contain at least one lower case and one upper case letter.
                     Allowed special characters:
@@ -230,43 +221,43 @@ const Register = () => {
                 </p>
             </div>
 
-            <div className={classes['input-parent']}>
+            <div className={ classes['input-parent'] }>
                 <label htmlFor="confirmPass">
                     Confirm Password:
-                    <span className={matchingPwds && validConfirmPwd ? classes.valid : classes.hide}>
-                        <FontAwesomeIcon icon={faCheck}/>
+                    <span className={ matchingPwds && validConfirmPwd ? classes.valid : classes.hide }>
+                        <FontAwesomeIcon icon={ faCheck }/>
                     </span>
-                    <span className={matchingPwds || !validConfirmPwd ? classes.hide : classes.invalid}>
-                        <FontAwesomeIcon icon={faTimes}/>
+                    <span className={ matchingPwds || !validConfirmPwd ? classes.hide : classes.invalid }>
+                        <FontAwesomeIcon icon={ faTimes }/>
                     </span>
 
                 </label>
                 <input
                     type="password"
                     id="confirmPass"
-                    value={confirmPwd}
-                    onInput={(e) => {
+                    value={ confirmPwd }
+                    onInput={ (e) => {
                         setConfirmPwd(e.target.value)
-                    }}
+                    } }
                     required
-                    aria-invalid={validConfirmPwd ? "false" : "true"}
+                    aria-invalid={ validConfirmPwd ? "false" : "true" }
                     aria-describedby="confirm-note"
-                    onFocus={() => setConfirmPwdFocus(true)}
-                    onBlur={() => setConfirmPwdFocus(false)}
+                    onFocus={ () => setConfirmPwdFocus(true) }
+                    onBlur={ () => setConfirmPwdFocus(false) }
                 />
                 <p id="confirm-note"
-                   className={confirmPwdFocus && !matchingPwds ? classes.instructions : "offScreen"}>
-                    <FontAwesomeIcon icon={faInfoCircle}/>
+                   className={ confirmPwdFocus && !matchingPwds ? classes.instructions : "offScreen" }>
+                    <FontAwesomeIcon icon={ faInfoCircle }/>
                     Must match the password input field.
                 </p>
             </div>
 
-            <div className={classes['button-wrapper']}>
-                <button className={classes['login-btn']} type="submit"
-                        disabled={!validFirstName || !validLastName || !validEmail || !matchingPwds}
-                        onClick={handleSubmit}>Register
+            <div className={ classes['button-wrapper'] }>
+                <button className={ classes['login-btn'] } type="submit"
+                        disabled={ !validFirstName || !validLastName || !validEmail || !matchingPwds }
+                        onClick={ handleSubmit }>Register
                 </button>
-                <button className={classes['login-btn']}><Link to="/login">Already Have an account?</Link></button>
+                <button className={ classes['login-btn'] }><Link to="/login">Already Have an account?</Link></button>
             </div>
         </form>
     </Fragment>)

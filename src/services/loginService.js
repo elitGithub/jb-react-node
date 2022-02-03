@@ -1,9 +1,10 @@
 import axios from './axios';
+
 const LoginService = {
     login: async (user) => {
         const response = await axios.post(
             `/api/users/login`,
-            {username: user.userName, password: user.password},
+            { userName: user.userName, password: user.password },
             {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
@@ -17,12 +18,12 @@ const LoginService = {
             const res = await axios.get(
                 `/api/users/login`,
                 {
-                    headers: { 'Content-Type': 'application/json', "Authorization" : `Bearer ${token}` },
+                    headers: { 'Content-Type': 'application/json', "Authorization": `Bearer ${token}` },
                     withCredentials: true,
                 });
 
             const response = await res.data;
-            if (response.hasOwnProperty('success') && response.success === true) {
+            if (response.hasOwnPropety('success') && response.success === true) {
                 localStorage.setItem('token', response.data.token);
                 return response.data;
             }

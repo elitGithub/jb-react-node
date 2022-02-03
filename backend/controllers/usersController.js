@@ -2,11 +2,27 @@ const User = require('../models/User');
 const logEvents = require('../middleware/logEvents');
 const passport = require('passport');
 const jwt = require("jsonwebtoken");
+const auth_hdr = require("passport-jwt/lib/auth_header");
+const AUTH_HEADER = "authorization";
+const LEGACY_AUTH_SCHEME = "JWT";
+const BEARER_AUTH_SCHEME = 'bearer:';
 
+const extractor = (request) =>  {
+    const auth_scheme_lower = BEARER_AUTH_SCHEME.toLowerCase();
+    let token = null;
+    if (request.headers[AUTH_HEADER]) {
+        const auth_params = auth_hdr.parse(request.headers[AUTH_HEADER]);
+        if (auth_params && auth_scheme_lower === auth_params.scheme.toLowerCase()) {
+            token = auth_params.value;
+        }
+    }
+    return token;
+};
 
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
 const register = async (req, res) => {
     const { userName, password } = req.body;
     if (!password || !userName) {
@@ -38,8 +54,6 @@ const register = async (req, res) => {
                     } else {
                         req.login(user, (err) => {
                             if (err) {
-                                console.log('error here, line 40');
-                                console.log('41', err);
                                 res.json({ success: false, message: err })
                             } else {
                                 const token = jwt.sign({
@@ -47,7 +61,7 @@ const register = async (req, res) => {
                                         username: user.username
                                     }, process.env.SECRET,
                                     { expiresIn: '24h' })
-                                res.json({ success: true, message: "Authentication successful", token: token });
+                                res.json({ success: true, message: "Authentication successful", data: { token } });
                             }
                         })
                     }
@@ -64,7 +78,35 @@ const register = async (req, res) => {
     }
 };
 
-const login = async (params) => {};
+const login = async (req, res) => {
+    if (req.headers.authorization && req.headers.authorization.length) {
+        let valid = false;
+        const token = extractor(req);
+        if (token) {
+            const decodedToken = jwt.decode(token, {
+                complete: true
+            });
+
+            if (!decodedToken) {
+                res.json({ success: false, message: "", data: [] });
+            }
+
+            if (decodedToken) {
+                console.log(decodedToken.payload);
+                console.log(Date.now());
+                // const token = jwt.sign({
+                //         userId: user._id,
+                //         username: user.username
+                //     }, process.env.SECRET,
+                //     { expiresIn: '24h' })
+                res.json({ success: true, message: "Authentication successful", data: { decodedToken } });
+                return;
+            }
+
+        }
+        res.json({ success: false, message: "", data: [] });
+    }
+};
 
 const findUserByEmail = async (searchParams) => {
     try {
