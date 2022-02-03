@@ -8,7 +8,6 @@ import AdminPanel from "../Pages/AdminPanel";
 import CreateEditVacation from "../Pages/CreateEditVacation";
 import { useDispatch, useSelector } from "react-redux";
 import { refresh } from "../features/user";
-import LoginService from "../services/loginService";
 
 const Main = () => {
     const user = useSelector((state) => state.user.value);

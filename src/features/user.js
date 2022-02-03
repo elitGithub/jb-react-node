@@ -33,7 +33,7 @@ export const register = createAsyncThunk('users/register', async (user, thunk) =
 });
 
 export const refresh = createAsyncThunk('users/refresh', async (user, thunk) => {
-    return LoginService.checkLogin();
+    return await LoginService.checkLogin();
 });
 
 export const login = createAsyncThunk('users/login', async (user, thunk) => {

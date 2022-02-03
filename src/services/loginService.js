@@ -23,7 +23,7 @@ const LoginService = {
                 });
 
             const response = await res.data;
-            if (response.hasOwnPropety('success') && response.success === true) {
+            if (response.hasOwnProperty('success') && response.success === true) {
                 localStorage.setItem('token', response.data.token);
                 return response.data;
             }
