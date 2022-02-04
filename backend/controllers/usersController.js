@@ -1,9 +1,8 @@
-const User = require('../models/User');
 const logEvents = require('../middleware/logEvents');
 const jwt = require("jsonwebtoken");
 
-const { create, userAuth } = require("../models/User");
-const extractor = require("../middleware/jwtUtils");
+const User = require("../models/User");
+const jwtUtils = require("../middleware/jwtUtils");
 
 const register = async (req, res) => {
     if (!req.body.password || !req.body.userName) {
@@ -17,7 +16,7 @@ const register = async (req, res) => {
         return;
     }
     try {
-        return await create(req, res)
+        return await User.create(req, res);
     } catch (e) {
         logEvents.customEmitter.emit('error', e);
         return res.status(500).json({
@@ -29,7 +28,7 @@ const register = async (req, res) => {
 };
 
 const login = (req, res) => {
-    return userAuth(req, res);
+    return User.userAuth(req, res);
 }
 
 const refresh = async (req, res) => {
@@ -38,20 +37,18 @@ const refresh = async (req, res) => {
         return;
     }
 
-    let token = extractor(req);
+    let token = jwtUtils.extractor(req);
 
     let decoded = jwt.decode(token, { complete: true });
 
     if (decoded && decoded.payload) {
         const user = decoded.payload;
-        const token = jwt.sign({
-                userId: user.userId,
-                username: user.userName,
-                firstName: user.firstName,
-                lastName: user.lastName
-            }, process.env.SECRET,
-            { expiresIn: '24h' });
-        return res.json({ success: true, message: "Refresh Successful", data: { token, userName: user.userName, firstName: user.firstName, lastName: user.lastName } });
+        const token = jwtUtils.sign(user);
+        return res.json({
+            success: true,
+            message: "Refresh Successful",
+            data: { token, userName: user.userName, firstName: user.firstName, lastName: user.lastName }
+        });
     }
 
     res.json({ success: false, message: "", data: [] });

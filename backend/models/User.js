@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const passportLocalMongoose = require('passport-local-mongoose');
 const passport = require("passport");
-const jwt = require("jsonwebtoken");
+const ROLES = require("../shared/roles");
+const jwtUtils = require("../middleware/jwtUtils");
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -29,7 +30,7 @@ const userSchema = new mongoose.Schema({
         default: () => Date.now()
     },
     followedVacations: [String],
-    // role: mongoose.SchemaTypes.ObjectId <- references another object based on id. Will be implemented with the Role model.
+    role: [String],
 });
 
 userSchema.plugin((passportLocalMongoose));
@@ -43,7 +44,7 @@ passport.deserializeUser(User.deserializeUser());
 const create = async (req, res) => {
     const { userName, password, firstName, lastName } = req.body;
     // the first object contains all the stuff we want to create the user with (list first name and so on). Passwords are hashed and handled separately.
-    return await User.register({ username: userName, firstName, lastName }, password, (err, user) => {
+    return await User.register({ username: userName, firstName, lastName, role: ROLES.Customer }, password, (err, user) => {
         if (err) {
             return res.status(409).json({
                 success: false,
@@ -57,20 +58,18 @@ const create = async (req, res) => {
                 if (err) {
                     res.json({ success: false, message: err })
                 } else if (!user) {
-                    res.json({ success: false, message: 'username or password incorrect' });
+                    res.json({ success: false, message: 'Username or Password incorrect' });
                 } else {
                     req.login(user, (err) => {
                         if (err) {
                             res.json({ success: false, message: err })
                         } else {
-                            const token = jwt.sign({
-                                    userId: user._id,
-                                    username: user.username,
-                                    firstName: user.firstName,
-                                    lastName: user.lastName
-                                }, process.env.SECRET,
-                                { expiresIn: '24h' });
-                            res.json({ success: true, message: "Authentication successful", data: { token, userName, firstName, lastName } });
+                            const token = jwtUtils.sign(user);
+                            res.json({
+                                success: true,
+                                message: "Authentication successful",
+                                data: { token, userName, firstName, lastName, role: user.role }
+                            });
                         }
                     })
                 }
@@ -79,6 +78,15 @@ const create = async (req, res) => {
     });
 }
 
+
+const userInfo = async (user) => {
+    const userinfo = await User.findOne({ username: user.username });
+    if (userinfo) {
+        return userinfo;
+    }
+
+    return null;
+}
 const userAuth = (req, res) => {
     const user = new User({
         username: req.body.userName,
@@ -96,30 +104,29 @@ const userAuth = (req, res) => {
             if (err) {
                 res.json({ success: false, message: err })
             } else {
-                req.login(user, (err) => {
+                req.login(user, async (err) => {
                     if (err) {
                         res.json({ success: false, message: err })
                     } else {
-                        const token = jwt.sign({
-                                userId: user._id,
-                                username: user.username,
-                                firstName: user.firstName,
-                                lastName: user.lastName
-                            }, process.env.SECRET,
-                            { expiresIn: '24h' });
+                        const registeredUser = await userInfo(user);
+                        const token = jwtUtils.sign(registeredUser);
                         res.json({
                             success: true,
                             message: "Authentication successful",
-                            data: { token, userName: user.username, firstName: user.firstName, lastName: user.lastName }
+                            data: {
+                                token,
+                                userName: registeredUser.username,
+                                firstName: registeredUser.firstName,
+                                lastName: registeredUser.lastName,
+                                role: registeredUser.role
+                            }
                         });
                     }
-                })
+                });
             }
         })(req, res);
     });
 }
 
 
-module.exports = { User };
-module.exports = { create };
-module.exports = { userAuth };
+module.exports = { User, create, userAuth };

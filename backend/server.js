@@ -34,12 +34,12 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'build/')));
 app.use(rootRouter);
 app.use('/api/users/', usersRouter);
-app.use(vacationsRouter);
+app.use('/api/vacations/', vacationsRouter);
 
 app.all('*', (req, res) => {
     res.redirect('/');

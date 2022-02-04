@@ -49,4 +49,4 @@ const errorsLogger = (err, req, res, next) => {
 customEmitter.on('log', message => logEvents(message));
 customEmitter.on('error', message => logErrors(message));
 
-module.exports = { requestLogger, customEmitter, errorsLogger };
+module.exports = { requestLogger, customEmitter, errorsLogger, logErrors };

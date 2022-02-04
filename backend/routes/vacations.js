@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
+const vacationsController = require('../controllers/vacationsController');
 
-router.get('/vacation-list(.html)?', (req, res) => {
-    res.redirect('/');
-});
+router.route('/vacation-list(.html)?')
+    .get((req, res) => vacationsController.list(req, res))
+    .post();
 
+router.route('/vacation(.html)?/:id?')
+    .get((req, res) => vacationsController.readVacation(req, res))
+    .post((req, res) => vacationsController.createVacation(req, res));
 
 module.exports = router;
