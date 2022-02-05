@@ -55,13 +55,13 @@ const create = async (req, res) => {
         }
 
         if (user) {
-            return passport.authenticate('local', (err, info) => {
+            return passport.authenticate('local', {}, (err) => {
                 if (err) {
-                    res.json({ success: false, message: err })
+                    return res.json({ success: false, message: err })
                 } else if (!user) {
-                    res.json({ success: false, message: 'Username or Password incorrect' });
+                    return res.json({ success: false, message: 'Username or Password incorrect' });
                 } else {
-                    req.login(user, (err) => {
+                    return req.login(user, (err) => {
                         if (err) {
                             res.json({ success: false, message: err })
                         } else {
@@ -101,17 +101,17 @@ const userAuth = (req, res) => {
                 data: []
             });
         }
-        return passport.authenticate('local', (err) => {
+        return passport.authenticate('local', {}, (err) => {
             if (err) {
-                res.json({ success: false, message: err })
+                return res.json({ success: false, message: err })
             } else {
-                req.login(user, async (err) => {
+                return req.login(user, async (err) => {
                     if (err) {
-                        res.json({ success: false, message: err })
+                        return res.json({ success: false, message: err })
                     } else {
                         const registeredUser = await userInfo(user);
                         const token = jwtUtils.sign(registeredUser);
-                        res.json({
+                        return res.json({
                             success: true,
                             message: "Authentication successful",
                             data: {
