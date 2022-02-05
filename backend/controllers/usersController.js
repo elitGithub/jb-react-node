@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
 const jwtUtils = require("../middleware/jwtUtils");
+const passport = require("passport");
 
 const register = async (req, res) => {
     if (!req.body.password || !req.body.userName) {

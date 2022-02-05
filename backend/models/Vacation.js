@@ -69,7 +69,7 @@ const update = async (req, res) => {
 
     const vacation = await Vacation.findOne({ _id: req.params.id });
     if (vacation) {
-
+        return res.json({ success: true, message: '', data: {} });
     }
 };
 

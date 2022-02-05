@@ -4,6 +4,7 @@ const passport = require("passport");
 const ROLES = require("../shared/roles");
 const jwtUtils = require("../middleware/jwtUtils");
 
+
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -100,7 +101,7 @@ const userAuth = (req, res) => {
                 data: []
             });
         }
-        return passport.authenticate('local', (err, info) => {
+        return passport.authenticate('local', (err) => {
             if (err) {
                 res.json({ success: false, message: err })
             } else {
