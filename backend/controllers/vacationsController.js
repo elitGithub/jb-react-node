@@ -1,33 +1,48 @@
-const logEvents = require('../middleware/logEvents');
-const jwt = require("jsonwebtoken");
 const Vacation = require('../models/Vacation');
+const jwtUtils = require("../middleware/jwtUtils");
 
-const list = (req, res) => {
-    const authHeader = req.headers.authorization || req.headers.Authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
-        return res.sendStatus(401);
+
+const list = async (req, res) => {
+    const authHeader = req.headers?.authorization || req.headers?.Authorization;
+    const authorized = await jwtUtils.validate(authHeader);
+    if (authorized) {
+        return await Vacation.list(req, res);
+    } else {
+        return res.sendStatus(403);
     }
-
-    const token = authHeader.split(' ')[1];
-    jwt.verify(
-        token,
-        process.env.SECRET,
-        (err, decoded) => {
-            if (err) {
-                logEvents.customEmitter.emit('error', err);
-                return res.sendStatus(403);
-            }
-            Vacation.list(req, res);
-        }
-    );
 }
 
-const readVacation = (req, res) => {
-    return Vacation.readOne(req, res);
+const readVacation = async (req, res) => {
+    const authHeader = req.headers?.authorization || req.headers?.Authorization;
+    const authorized = await jwtUtils.validate(authHeader);
+    if (authorized) {
+        return await Vacation.readOne(req, res);
+    } else {
+        return res.sendStatus(403);
+    }
+
 };
 
-const createVacation = (req, res) => {
-    return Vacation.create(req, res);
+const createVacation = async (req, res) => {
+    const authHeader = req.headers?.authorization || req.headers?.Authorization;
+    const authorized = await jwtUtils.validate(authHeader);
+    if (authorized) {
+        return await Vacation.create(req, res);
+    } else {
+        return res.sendStatus(403);
+    }
+
 };
 
-module.exports = { list, createVacation, readVacation };
+const updateVacation = async (req, res) => {
+    const authHeader = req.headers?.authorization || req.headers?.Authorization;
+    const authorized = await jwtUtils.validate(authHeader);
+    if (authorized) {
+        return await Vacation.update(req, res);
+    } else {
+        return res.sendStatus(403);
+    }
+
+};
+
+module.exports = { list, createVacation, readVacation, updateVacation };

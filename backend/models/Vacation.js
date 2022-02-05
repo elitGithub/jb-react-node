@@ -36,7 +36,7 @@ const Vacation = mongoose.model('Vacation', vacationSchema);
 const list = async (req, res) => {
     try {
         const vacations = await Vacation.find({});
-        res.json({success: true, message: '', data: vacations});
+        res.json({ success: true, message: '', data: vacations });
     } catch (e) {
         await logger.logErrors(e);
         return res.json({ success: false, message: e, data: {} });
@@ -56,13 +56,21 @@ const create = async (req, res) => {
 
 const readOne = async (req, res) => {
     if (!req.params.id) {
-        return res.json({success: false, message: 'Missing required parameter id.', data: {}});
+        return res.json({ success: false, message: 'Missing required parameter id.', data: {} });
     }
-    const vacation = await Vacation.findOne({_id: req.params.id});
-    res.json({success: true, message: '', data: vacation});
+    const vacation = await Vacation.findOne({ _id: req.params.id });
+    res.json({ success: true, message: '', data: vacation });
 }
 
-const update = (req, res) => {
+const update = async (req, res) => {
+    if (!req.params.id) {
+        return res.json({ success: false, message: 'Missing required parameter id.', data: {} });
+    }
+
+    const vacation = await Vacation.findOne({ _id: req.params.id });
+    if (vacation) {
+
+    }
 };
 
 module.exports = { Vacation, create, update, list, readOne };

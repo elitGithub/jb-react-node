@@ -1,5 +1,6 @@
 const auth_hdr = require("passport-jwt/lib/auth_header");
 const jwt = require("jsonwebtoken");
+const logEvents = require("./logEvents");
 
 const AUTH_HEADER = "authorization";
 const LEGACY_AUTH_SCHEME = "JWT";
@@ -33,4 +34,24 @@ const sign = (user) => {
     return null;
 }
 
-module.exports = { extractor, sign };
+const validate = async (authHeader) => {
+    if (!authHeader?.startsWith('Bearer ')) {
+        return false;
+    }
+
+    const token = authHeader.split(' ')[1];
+    return await jwt.verify(
+        token,
+        process.env.SECRET,
+        (err, decoded) => {
+            if (err) {
+                logEvents.customEmitter.emit('error', err);
+                return true;
+            }
+
+            return decoded;
+        }
+    );
+}
+
+module.exports = { extractor, sign, validate };

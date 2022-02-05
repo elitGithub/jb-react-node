@@ -8,6 +8,7 @@ router.route('/vacation-list(.html)?')
 
 router.route('/vacation(.html)?/:id?')
     .get((req, res) => vacationsController.readVacation(req, res))
+    .put((req, res) => vacationsController.updateVacation(req, res))
     .post((req, res) => vacationsController.createVacation(req, res));
 
 module.exports = router;
