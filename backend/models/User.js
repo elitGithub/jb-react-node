@@ -23,7 +23,7 @@ const create = async (req, res) => {
         }
 
         if (user) {
-            return passport.authenticate('local', {}, (err) => {
+            return passport.authenticate('local', (err) => {
                 if (err) {
                     return res.json({ success: false, message: err })
                 } else if (!user) {
@@ -69,7 +69,7 @@ const userAuth = (req, res) => {
                 data: []
             });
         }
-        return passport.authenticate('local', {}, (err) => {
+        return passport.authenticate('local', (err) => {
             if (err) {
                 return res.json({ success: false, message: err })
             } else {
