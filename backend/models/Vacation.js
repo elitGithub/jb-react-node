@@ -59,7 +59,20 @@ const update = async (req, res) => {
 
     const vacation = await Vacation.findOne({ _id: req.params.id });
     if (vacation) {
-        return res.json({ success: true, message: '', data: {} });
+        vacation.name = req.body.name || vacation.name;
+        vacation.description = req.body.description || vacation.description;
+        vacation.image = req.body.image || vacation.image;
+        vacation.dateStart = req.body.dateStart || vacation.dateStart;
+        vacation.dateEnd = req.body.dateEnd || vacation.dateEnd;
+
+        try {
+            await vacation.save();
+            return res.json({ success: true, message: '', data: { vacation } });
+        } catch (e) {
+            await logger.logErrors(e);
+            return res.json({ success: false, message: 'An error occurred', data: {} });
+        }
+
     }
 };
 

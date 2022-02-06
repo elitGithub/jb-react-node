@@ -12,7 +12,7 @@ passport.deserializeUser(User.deserializeUser());
 
 const create = async (req, res) => {
     const { userName, password, firstName, lastName } = req.body;
-    // the first object contains all the stuff we want to create the user with (list first name and so on). Passwords are hashed and handled separately.
+    // the first object contains all the stuff we want to create the user with (first name and so on). Passwords are hashed and handled separately.
     return await User.register({
         username: userName,
         firstName,
