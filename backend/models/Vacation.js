@@ -1,35 +1,6 @@
 const mongoose = require('mongoose');
 const logger = require('../middleware/logEvents');
-
-const vacationSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        minLength: 3,
-        validator: v => /[A-Za-z]/.test(v)
-    },
-    description: {
-        type: String,
-        required: true,
-        minLength: 3,
-        validator: v => /[A-Za-z]/.test(v)
-    },
-    image: {
-        type: String,
-        required: true,
-    },
-    dateStart: {
-        type: Date,
-        default: () => Date.now(),
-    },
-    dateEnd: {
-        type: Date,
-        default: () => Date.now(),
-    },
-    price: {},
-    followers: {},
-});
-
+const vacationSchema = require('../db/VacationSchema');
 
 const Vacation = mongoose.model('Vacation', vacationSchema);
 

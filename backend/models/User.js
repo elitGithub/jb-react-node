@@ -1,40 +1,8 @@
 const mongoose = require('mongoose');
-const passportLocalMongoose = require('passport-local-mongoose');
 const passport = require("passport");
 const ROLES = require("../shared/roles");
 const jwtUtils = require("../middleware/jwtUtils");
-
-
-const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        lowercase: true,
-        immutable: true,
-        minLength: 3,
-        validator: v => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v),
-        message: props => `${ props.value } is not a valid email`
-    },
-    password: {
-        type: String,
-        minLength: 8
-    },
-    firstName: String,
-    lastName: String,
-    createdAt: {
-        type: Date,
-        default: () => Date.now(),
-        immutable: true,
-    },
-    updatedAt: {
-        type: Date,
-        default: () => Date.now()
-    },
-    followedVacations: [String],
-    role: [String],
-});
-
-userSchema.plugin((passportLocalMongoose));
+const userSchema = require('../db/UserSchema');
 
 const User = mongoose.model('User', userSchema);
 passport.use(User.createStrategy());
@@ -80,8 +48,8 @@ const create = async (req, res) => {
 }
 
 
-const userInfo = async (user) => {
-    const userinfo = await User.findOne({ username: user.username });
+const userInfo = async (username) => {
+    const userinfo = await User.findOne({ username: username });
     if (userinfo) {
         return userinfo;
     }
@@ -109,7 +77,7 @@ const userAuth = (req, res) => {
                     if (err) {
                         return res.json({ success: false, message: err })
                     } else {
-                        const registeredUser = await userInfo(user);
+                        const registeredUser = await userInfo(req.body.userName);
                         const token = jwtUtils.sign(registeredUser);
                         return res.json({
                             success: true,
