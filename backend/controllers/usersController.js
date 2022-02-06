@@ -28,8 +28,8 @@ const register = async (req, res) => {
     }
 };
 
-const login = (req, res) => {
-    return User.userAuth(req, res);
+const login = async (req, res) => {
+    return await User.userAuth(req, res);
 }
 
 const refresh = async (req, res) => {

@@ -13,7 +13,12 @@ passport.deserializeUser(User.deserializeUser());
 const create = async (req, res) => {
     const { userName, password, firstName, lastName } = req.body;
     // the first object contains all the stuff we want to create the user with (list first name and so on). Passwords are hashed and handled separately.
-    return await User.register({ username: userName, firstName, lastName, role: ROLES.Customer }, password, (err, user) => {
+    return await User.register({
+        username: userName,
+        firstName,
+        lastName,
+        role: ROLES.Customer
+    }, password, (err, user) => {
         if (err) {
             return res.status(409).json({
                 success: false,
@@ -47,53 +52,35 @@ const create = async (req, res) => {
     });
 }
 
-
-const userInfo = async (username) => {
-    const userinfo = await User.findOne({ username: username });
-    if (userinfo) {
-        return userinfo;
-    }
-
-    return null;
-}
-const userAuth = (req, res) => {
-    const user = new User({
-        username: req.body.userName,
-        password: req.body.password
-    });
-    req.login(user, (err) => {
+const userAuth = async (req, res) => {
+    const authenticate = User.authenticate();
+    authenticate(req.body.userName, req.body.password, (err, result) => {
         if (err) {
-            return res.status(409).json({
-                success: false,
-                message: err.toString(),
-                data: []
-            });
+            return res.status(401).json({ success: false, message: err })
         }
-        return passport.authenticate('local', (err) => {
-            if (err) {
-                return res.json({ success: false, message: err })
-            } else {
-                return req.login(user, async (err) => {
-                    if (err) {
-                        return res.json({ success: false, message: err })
-                    } else {
-                        const registeredUser = await userInfo(req.body.userName);
-                        const token = jwtUtils.sign(registeredUser);
-                        return res.json({
-                            success: true,
-                            message: "Authentication successful",
-                            data: {
-                                token,
-                                userName: registeredUser.username,
-                                firstName: registeredUser.firstName,
-                                lastName: registeredUser.lastName,
-                                role: registeredUser.role
-                            }
-                        });
-                    }
-                });
+
+        if (!result) {
+            return res.status(401).json({ success: false, message: 'Bad credentials' })
+        }
+
+        const token = jwtUtils.sign({
+            _id: result._id,
+            username: result.username,
+            firstName: result.firstName,
+            lastName: result.lastName,
+            userRole: result.role.join(', ')
+        });
+        return res.json({
+            success: true,
+            message: "Authentication successful",
+            data: {
+                token,
+                userName: result.username,
+                firstName: result.firstName,
+                lastName: result.lastName,
+                role: result.role.join(', ')
             }
-        })(req, res);
+        });
     });
 }
 

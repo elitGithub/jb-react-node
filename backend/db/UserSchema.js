@@ -30,6 +30,6 @@ const userSchema = new mongoose.Schema({
     role: [String],
 });
 
-userSchema.plugin((passportLocalMongoose));
+userSchema.plugin(passportLocalMongoose);
 
 module.exports = userSchema;
