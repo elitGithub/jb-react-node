@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const logger = require('../middleware/logEvents');
 const vacationSchema = require('../db/VacationSchema');
 const jwtUtils = require("../middleware/jwtUtils");
+const userUtils = require("../middleware/userUtils");
 const jwt = require("jsonwebtoken");
-const { User } = require("./User");
 
 const Vacation = mongoose.model('Vacation', vacationSchema);
 
@@ -39,18 +39,14 @@ const follow = async (req, res) => {
         return res.json({ success: false, message: 'No such entity.', data: {} });
     }
 
-    const token = jwtUtils.extractor(req);
-    const decoded = jwt.decode(token, { complete: true });
-    if (decoded) {
-        const user = await jwtUtils.userFromToken(req);
-        if (user) {
-            const index = user.followedVacations.indexOf(req.params.id);
-            if (index > -1) {
-                return res.json({ success: true, message: 'Vacation is already followed', data: {} });
-            }
-            user.followedVacations.push(req.params.id);
-            user.save();
+    const user = await userUtils.userFromToken(req);
+    if (user) {
+        const index = user.followedVacations.indexOf(req.params.id);
+        if (index > -1) {
+            return res.json({ success: true, message: 'Vacation is already followed', data: {} });
         }
+        user.followedVacations.push(req.params.id);
+        user.save();
     }
 
     return res.json({ success: true, message: '', data: {} });

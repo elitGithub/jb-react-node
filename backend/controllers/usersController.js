@@ -1,6 +1,7 @@
 const logEvents = require('../middleware/logEvents');
 const User = require("../models/User");
 const jwtUtils = require("../middleware/jwtUtils");
+const userUtils = require("../middleware/userUtils");
 
 const register = async (req, res) => {
     if (!req.body.password || !req.body.userName) {
@@ -30,7 +31,7 @@ const login = async (req, res) => {
 }
 
 const refresh = async (req, res) => {
-    const user = await jwtUtils.userFromToken(req);
+    const user = await userUtils.userFromToken(req);
     if (user) {
         const token = jwtUtils.sign(user);
         return res.json({

@@ -4,28 +4,10 @@ const logEvents = require("./logEvents");
 const mongoose = require("mongoose");
 const userSchema = require("../db/UserSchema");
 
-const User = mongoose.model('User', userSchema);
-
 const AUTH_HEADER = "authorization";
 const LEGACY_AUTH_SCHEME = "JWT";
 const BEARER_AUTH_SCHEME = 'bearer';
 
-const userFromToken = async (request) => {
-    const token = extractToken(request);
-    if (!token) {
-        return null;
-    }
-    const decoded = jwt.decode(token, { complete: true });
-    if (!decoded) {
-        return null;
-    }
-
-    const username = decoded?.payload?.username;
-    if (username) {
-        return User.findOne({ username: username });
-    }
-    return null;
-}
 
 const extractToken = (request) => {
     const auth_scheme_lower = BEARER_AUTH_SCHEME.toLowerCase();
@@ -75,4 +57,4 @@ const validate = async (authHeader) => {
     );
 }
 
-module.exports = { extractor: extractToken, sign, validate, userFromToken };
+module.exports = { extractor: extractToken, sign, validate };
