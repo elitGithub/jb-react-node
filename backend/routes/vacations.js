@@ -6,6 +6,10 @@ router.route('/vacation-list(.html)?')
     .get((req, res) => vacationsController.list(req, res))
     .post();
 
+router.route('/vacation-follow(.html)?/:id?')
+    .get((req, res) => vacationsController.follow(req, res))
+    .post();
+
 router.route('/vacation(.html)?/:id?')
     .get((req, res) => vacationsController.readVacation(req, res))
     .put((req, res) => vacationsController.updateVacation(req, res))

@@ -1,9 +1,6 @@
 const logEvents = require('../middleware/logEvents');
-const jwt = require("jsonwebtoken");
-
 const User = require("../models/User");
 const jwtUtils = require("../middleware/jwtUtils");
-const passport = require("passport");
 
 const register = async (req, res) => {
     if (!req.body.password || !req.body.userName) {
@@ -33,17 +30,8 @@ const login = async (req, res) => {
 }
 
 const refresh = async (req, res) => {
-    if (req.isAuthenticated()) {
-        res.json({ success: true, message: '', data: {} });
-        return;
-    }
-
-    let token = jwtUtils.extractor(req);
-
-    let decoded = jwt.decode(token, { complete: true });
-
-    if (decoded && decoded.payload) {
-        const user = decoded.payload;
+    const user = await jwtUtils.userFromToken(req);
+    if (user) {
         const token = jwtUtils.sign(user);
         return res.json({
             success: true,

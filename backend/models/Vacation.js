@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const logger = require('../middleware/logEvents');
 const vacationSchema = require('../db/VacationSchema');
+const jwtUtils = require("../middleware/jwtUtils");
+const jwt = require("jsonwebtoken");
+const { User } = require("./User");
 
 const Vacation = mongoose.model('Vacation', vacationSchema);
 
@@ -26,12 +29,32 @@ const create = async (req, res) => {
 
 
 const readOne = async (req, res) => {
-    if (!req.params.id) {
-        return res.json({ success: false, message: 'Missing required parameter id.', data: {} });
-    }
     const vacation = await Vacation.findOne({ _id: req.params.id });
     res.json({ success: true, message: '', data: vacation });
 }
+
+const follow = async (req, res) => {
+    const vacation = await Vacation.findOne({ _id: req.params.id });
+    if (!vacation) {
+        return res.json({ success: false, message: 'No such entity.', data: {} });
+    }
+
+    const token = jwtUtils.extractor(req);
+    const decoded = jwt.decode(token, { complete: true });
+    if (decoded) {
+        const user = await jwtUtils.userFromToken(req);
+        if (user) {
+            const index = user.followedVacations.indexOf(req.params.id);
+            if (index > -1) {
+                return res.json({ success: true, message: 'Vacation is already followed', data: {} });
+            }
+            user.followedVacations.push(req.params.id);
+            user.save();
+        }
+    }
+
+    return res.json({ success: true, message: '', data: {} });
+};
 
 const update = async (req, res) => {
     if (!req.params.id) {
@@ -44,4 +67,4 @@ const update = async (req, res) => {
     }
 };
 
-module.exports = { Vacation, create, update, list, readOne };
+module.exports = { Vacation, create, update, list, readOne, follow };

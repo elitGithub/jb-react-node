@@ -12,10 +12,26 @@ const list = async (req, res) => {
     }
 }
 
+const follow = async (req, res) => {
+    const authHeader = req.headers?.authorization || req.headers?.Authorization;
+    const authorized = await jwtUtils.validate(authHeader);
+    if (authorized) {
+        if (!req.params.id) {
+            return res.json({ success: false, message: 'Missing required parameter id.', data: {} });
+        }
+        return await Vacation.follow(req, res);
+    } else {
+        return res.sendStatus(403);
+    }
+}
+
 const readVacation = async (req, res) => {
     const authHeader = req.headers?.authorization || req.headers?.Authorization;
     const authorized = await jwtUtils.validate(authHeader);
     if (authorized) {
+        if (!req.params.id) {
+            return res.json({ success: false, message: 'Missing required parameter id.', data: {} });
+        }
         return await Vacation.readOne(req, res);
     } else {
         return res.sendStatus(403);
@@ -45,4 +61,4 @@ const updateVacation = async (req, res) => {
 
 };
 
-module.exports = { list, createVacation, readVacation, updateVacation };
+module.exports = { list, createVacation, readVacation, updateVacation, follow };
