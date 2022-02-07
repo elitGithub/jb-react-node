@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import UsersService from "../services/usersService";
 import loginService from "../services/loginService";
 import LoginService from "../services/loginService";
+import ROLES from "../shared/roles";
 
 const initialStateValue = {
     firstName: '',
@@ -33,12 +34,12 @@ export const register = createAsyncThunk('users/register', async (user, thunk) =
 });
 
 export const refresh = createAsyncThunk('users/refresh', async (user, thunk) => {
-    return await LoginService.checkLogin();
+    return await UsersService.checkLogin();
 });
 
 export const login = createAsyncThunk('users/login', async (user, thunk) => {
     try {
-        const res = await loginService.login(user);
+        const res = await UsersService.login(user);
         const data = res.data;
         if (res.hasOwnProperty('success') && res.success === true) {
             return data;
@@ -118,7 +119,8 @@ const loginPromiseFulfilled = (state, userData) => {
         state.pending = null;
         state.error = false;
         state.value = userData;
-        state.value.isAdmin = true;
+        const roles = userData.role.split(',');
+        state.value.isAdmin = (roles.indexOf(ROLES.Admin) > -1);
         state.value.loggedIn = userData.hasOwnProperty('token') && userData.token.length > 0;
         if (state.value.loggedIn) {
             localStorage.setItem('token', userData.token);

@@ -34,7 +34,7 @@ export const Navbar = () => {
             { loggedIn && <Link to={ '/vacation-list' }>
                 Vacation List
             </Link> }
-            { loggedIn && <Link to={ '/logout' } onClick={ () => dispatch((logout())) }>
+            { loggedIn && <Link to={ '/login' } onClick={ () => dispatch((logout())) }>
                 Logout
             </Link> }
             { !loggedIn && <Link to={ '/login' }>

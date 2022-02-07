@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes, } from "react-router-dom";
 import Login from "../Pages/Login";
 import Register from "../Pages/Register";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect } from "react";
 import { Navbar } from "./Navbar";
 import VacationList from "../Pages/VacationList";
 import AdminPanel from "../Pages/AdminPanel";

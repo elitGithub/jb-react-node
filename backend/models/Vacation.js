@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const logger = require('../middleware/logEvents');
 const vacationSchema = require('../db/VacationSchema');
-const jwtUtils = require("../middleware/jwtUtils");
 const userUtils = require("../middleware/userUtils");
-const jwt = require("jsonwebtoken");
 
 const Vacation = mongoose.model('Vacation', vacationSchema);
 

@@ -1,4 +1,5 @@
 import axios from './axios';
+import { tokenService } from "./tokenService";
 
 const LoginService = {
     login: async (user) => {
@@ -13,7 +14,7 @@ const LoginService = {
     },
 
     checkLogin: async () => {
-        const token = localStorage.getItem('token');
+        const token = tokenService.getToken();
         if (token) {
             const res = await axios.get(
                 `/api/users/login`,

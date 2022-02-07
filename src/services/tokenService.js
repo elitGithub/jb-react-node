@@ -1,0 +1,1 @@
+export const tokenService = { getToken: () => localStorage.getItem('token') };
