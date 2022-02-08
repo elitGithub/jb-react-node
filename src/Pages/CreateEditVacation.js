@@ -1,33 +1,48 @@
 import Modal from "../Components/Modal";
 import classes from "../Components/Login.module.css";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { showHide } from "../features/modal";
 
 const CreateEditVacation = props => {
-    const [inputs, setInputs] = useState({});
-    const [inputError, setInputError] = useState(false);
+    const user = useSelector((state) => state.user.value);
     const dispatch = useDispatch();
+    const emailRef = useRef();
+    const errRef = useRef();
+
+    // vacation Name
+    const [name, setName] = useState('');
+    const [nameFocus, setNameFocus] = useState(false);
+    const [validName, setValidName] = useState(false);
+    // vacation Name
+
+    // Description
+    const [description, setDescription] = useState('');
+    const [descFocus, setDescFocus] = useState(false);
+    const [validDesc, setValidDesc] = useState(false);
+    // Description
+
 
     const handleChange = (event) => {
-        setInputError(false);
-        const name = event.target.name;
-        const value = event.target.value;
-        setInputs(values => ({ ...values, [name]: value }));
-    }
 
+    }
+// https://blog.mobrand.com/wp-content/uploads/2020/12/Penang_Malasya-300x131.png
     const closeModal = () => {
         dispatch(showHide({ isShown: false }));
     }
+
+    const onSubmit = () => {
+
+    }
     return (<Modal>
-        <form>
+        <form onSubmit={ onSubmit }>
             <h2>{ props.title }</h2>
             <div className={ classes['input-parent'] }>
-                <label htmlFor="name">Email</label>
+                <label htmlFor="name">Vacation Name</label>
                 <input className={ inputError ? classes['input-error'] : '' }
                        type="text"
                        name="name"
-                       value={ props.vacationName || "" }
+                       value={ inputs.vacationName }
                        onInput={ handleChange }/>
             </div>
             <div className={ classes['input-parent'] }>
@@ -35,7 +50,7 @@ const CreateEditVacation = props => {
                 <input className={ inputError ? classes['input-error'] : '' }
                        type="text"
                        name="description"
-                       value={ props.description || "" }
+                       value={ inputs.description }
                        onInput={ handleChange }/>
             </div>
             <div className={ classes['input-parent'] }>
@@ -43,27 +58,35 @@ const CreateEditVacation = props => {
                 <input className={ inputError ? classes['input-error'] : '' }
                        type="text"
                        name="image-link"
-                       value={ props.image || "" }
+                       value={ inputs.image }
                        onInput={ handleChange }/>
             </div>
             <div className={ classes['input-parent'] }>
-                <label htmlFor="dates">Dates</label>
+                <label htmlFor="dateStart">Date Start</label>
                 <input className={ inputError ? classes['input-error'] : '' }
                        type="date"
-                       name="dates"
-                       value={ props.dates || "" }
+                       name="dateStart"
+                       value={ inputs.dateStart }
                        onInput={ handleChange }/>
             </div>
             <div className={ classes['input-parent'] }>
-                <label htmlFor="price">Dates</label>
+                <label htmlFor="dateEnd">Date End</label>
+                <input className={ inputError ? classes['input-error'] : '' }
+                       type="date"
+                       name="dateEnd"
+                       value={ inputs.dateEnd }
+                       onInput={ handleChange }/>
+            </div>
+            <div className={ classes['input-parent'] }>
+                <label htmlFor="price">Price</label>
                 <input className={ inputError ? classes['input-error'] : '' }
                        type="text"
                        name="price"
-                       value={ props.price || "" }
+                       value={ inputs.price }
                        onInput={ handleChange }/>
             </div>
             <div className={ classes['button-wrapper'] }>
-                <button className={ classes['login-btn'] } type="submit">Login</button>
+                <button className={ classes['login-btn'] } type="submit">Create</button>
                 <button className={ classes['cancel-btn'] } onClick={ closeModal }>Cancel</button>
             </div>
         </form>

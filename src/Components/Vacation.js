@@ -38,9 +38,9 @@ const Vacation = (props) => {
     return (<Fragment>
             <div className={ classes.card }>
                 <div className={ classes['card-header'] }>
-                    { !isAdmin && loggedIn && <div className={ classes['top-buttons'] }>
+                    { loggedIn && <div className={ classes['top-buttons'] }>
                         <span className={ tagClasses.join(' ') } onClick={ followOrUnfollow }>{ props.name }</span>
-                        <span className={ followClasses.join(' ') } onClick={ followOrUnfollow }>{ followText }</span>
+                        { !isAdmin && <span className={ followClasses.join(' ') } onClick={ followOrUnfollow }>{ followText }</span> }
                     </div> }
 
                     { isAdmin && <div className={ classes['top-buttons'] }>

@@ -100,6 +100,7 @@ const Register = () => {
     };
 
     return (<Fragment>
+        { user.loggedIn && <Navigate to="/"/> }
         { redirect && <Navigate to="/"/> }
         <form onSubmit={ handleSubmit } className="form">
             <p ref={ errRef } className={ errMessage ? "errorMessage" : "offScreen" }

@@ -68,7 +68,7 @@ const userAuth = async (req, res) => {
             username: result.username,
             firstName: result.firstName,
             lastName: result.lastName,
-            userRole: result.role.join(', ')
+            userRole: result.role.join(',')
         });
         return res.json({
             success: true,
@@ -78,7 +78,7 @@ const userAuth = async (req, res) => {
                 userName: result.username,
                 firstName: result.firstName,
                 lastName: result.lastName,
-                role: result.role.join(', ')
+                role: result.role.join(',')
             }
         });
     });
