@@ -83,6 +83,17 @@ a:active {
     }
 }
 
+.login-btn {
+    padding: 10px 18px;
+    font-size: 15px;
+    background: #1a3969;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    color: #f4f4f4;
+    transition: all 0.2s ease;
+}
+
 *,
 *:before,
 *:after {

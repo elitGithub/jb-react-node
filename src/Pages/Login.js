@@ -66,8 +66,8 @@ const Login = () => {
                     required/>
             </div>
             <div className={ classes['button-wrapper'] }>
-                <button className={ classes['login-btn'] } type="submit">Login</button>
-                <button className={ classes['login-btn'] }><Link to="/register">Don't have an account?</Link></button>
+                <button className="login-btn" type="submit">Login</button>
+                <button className="login-btn"><Link to="/register">Don't have an account?</Link></button>
             </div>
         </form>
 

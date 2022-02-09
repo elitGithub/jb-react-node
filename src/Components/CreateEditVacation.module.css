@@ -1,0 +1,71 @@
+.instructions {
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+    background: #000;
+    color: #fff;
+    padding: 0.25rem;
+    position: relative;
+    bottom: -10px;
+    text-overflow: clip;
+}
+
+.instructions > svg {
+    margin-right: 0.25rem;
+}
+
+.valid {
+    color: limegreen;
+    margin-left: 0.25rem;
+}
+
+.line {
+    display: inline-block;
+}
+
+.invalid {
+    color: red;
+    margin-left: 0.25rem;
+}
+
+.hide {
+    display: none;
+}
+
+
+.input-parent input {
+    padding: 10px 8px;
+    width: 100%;
+    font-size: 16px;
+    background: #323131;
+    border: none;
+    color: #c7c7c7;
+    border-radius: 4px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.input-parent input:hover {
+    background: #404040;
+}
+
+.input-parent input:focus {
+    box-shadow: 0 0 0 1px #0087ff;
+}
+
+.button-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.button-wrapper button {
+    margin: 0 0 0 5px;
+}
+.button-wrapper button:focus {
+    box-shadow: 0 0 0 3px black;
+}
+
+.button-wrapper button:hover {
+    opacity: 0.9;
+    cursor: pointer;
+}
