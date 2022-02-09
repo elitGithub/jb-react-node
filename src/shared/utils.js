@@ -22,3 +22,7 @@ export const validateAndMatchPasswords = (password, confirmPass) => {
 export const validateAlphanumeric = (string) =>  {
     return string && string.length > 0 && /^[\w\-\s]+$/.test(string);
 }
+
+export const validateNumbers = (number) =>  {
+    return number && !isNaN(number);
+}

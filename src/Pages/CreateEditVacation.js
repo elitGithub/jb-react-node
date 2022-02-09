@@ -3,9 +3,10 @@ import classes from "../Components/CreateEditVacation.module.css";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { showHide } from "../features/modal";
-import { validateAlphanumeric } from "../shared/utils";
+import { validateAlphanumeric, validateNumbers } from "../shared/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faInfoCircle, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { createVacation } from "../features/vacation";
 
 const CreateEditVacation = props => {
     const user = useSelector((state) => state.user.value);
@@ -36,15 +37,16 @@ const CreateEditVacation = props => {
     // Dates
 
     const [price, setPrice] = useState('');
+    const [validPrice, setValidPrice] = useState(false);
 
     const [errMessage, setErrMessage] = useState('');
 
     useEffect(() => {
-        setName(props.name);
-        setDescription(props.description);
-        setImage(props.image);
-        setDateStart(props.dateStart);
-        setDateEnd(props.dateEnd);
+        setName(props.name ?? '');
+        setDescription(props.description ?? '');
+        setImage(props.image ?? '');
+        setDateStart(props.dateStart ?? '');
+        setDateEnd(props.dateEnd ?? '');
     }, [props])
 
 
@@ -60,16 +62,40 @@ const CreateEditVacation = props => {
         setValidDesc(validateAlphanumeric(description));
     }, [description]);
 
+    useEffect(() => {
+        setValidPrice(validateNumbers(price));
+    }, [price]);
+
 
     const closeModal = () => {
         dispatch(showHide({ isShown: false }));
     }
 
-    const onSubmit = () => {
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        if (!name || !description || !image || !dateStart || !dateEnd || !price) {
+            setErrMessage('All fields are required.')
+            return;
+        }
 
+        // TODO: handle file upload first (if not using image url option).
+
+        const result = await dispatch(createVacation({ name, description, image, dateStart, dateEnd, price }));
+        // if (resUser.meta.requestStatus === 'rejected')
+        if (result.meta.requestStatus === 'rejected') {
+            setErrMessage(result.payload.message ? result.payload.message : 'An error ocurred');
+            errRef.current.focus();
+        } else if (result.meta.requestStatus === "fulfilled") {
+
+        } else if (!result.meta.requestStatus) {
+            setErrMessage('An error occurred');
+            errRef.current.focus();
+        }
     }
     return (<Modal>
-            { user.isAdmin && <form onSubmit={ onSubmit } >
+            { user.isAdmin && <form onSubmit={ onSubmit }>
+                <p ref={ errRef } className={ errMessage ? "errorMessage" : "offScreen" }
+                   aria-live="assertive">{ errMessage }</p>
                 <h2>{ props.title }</h2>
                 <div className={ classes['input-parent'] }>
                     <label htmlFor="name">Vacation Name
@@ -85,6 +111,7 @@ const CreateEditVacation = props => {
                         onChange={ (e) => {
                             setName(e.target.value)
                         } }
+                        required
                         aria-invalid={ validName ? "false" : "true" }
                         aria-describedby="namenote"
                         onFocus={ () => setNameFocus(true) }
@@ -96,7 +123,11 @@ const CreateEditVacation = props => {
                     </p>
                 </div>
                 <div className={ classes['input-parent'] }>
-                    <label htmlFor="description">Description</label>
+                    <label htmlFor="description">Description
+                        <FontAwesomeIcon icon={ faCheck } className={ validDesc ? classes.valid : classes.hide }/>
+                        <FontAwesomeIcon icon={ faTimes }
+                                         className={ validDesc || !description ? classes.hide : classes.invalid }/>
+                    </label>
                     <input
                         type="text"
                         name="description"
@@ -104,6 +135,7 @@ const CreateEditVacation = props => {
                         onChange={ (e) => {
                             setDescription(e.target.value)
                         } }
+                        required
                         aria-invalid={ validDesc ? "false" : "true" }
                         aria-describedby="descnote"
                         onFocus={ () => setDescFocus(true) }
@@ -114,12 +146,27 @@ const CreateEditVacation = props => {
                         Add some fun description.
                     </p>
                 </div>
+                <div className={ classes['input-parent'] }>
+                    <label htmlFor="price">Price
+                        <FontAwesomeIcon icon={ faCheck } className={ validPrice ? classes.valid : classes.hide }/>
+                        <FontAwesomeIcon icon={ faTimes }
+                                         className={ validPrice || !price ? classes.hide : classes.invalid }/></label>
+                    <input
+                        type="text"
+                        name="price"
+                        value={ price }
+                        required
+                        onChange={ (e) => {
+                            setPrice(e.target.value)
+                        } }/>
+                </div>
                 { imageUrl && <div className={ classes['input-parent'] }>
                     <label htmlFor="image-link">Image URL</label>
                     <input
                         type="text"
                         name="image-link"
                         value={ image }
+                        required
                         onChange={ (e) => {
                             setImageUrl(e.target.value)
                         } }/>
@@ -130,6 +177,7 @@ const CreateEditVacation = props => {
                         type="file"
                         name="image-link"
                         value={ image }
+                        required
                         onChange={ (e) => {
                             setImage(e.target.value)
                         } }/>
@@ -140,6 +188,7 @@ const CreateEditVacation = props => {
                         type="date"
                         name="dateStart"
                         value={ dateStart }
+                        required
                         onChange={ (e) => {
                             setDateStart(e.target.value)
                         } }/>
@@ -150,18 +199,9 @@ const CreateEditVacation = props => {
                         type="date"
                         name="dateEnd"
                         value={ dateEnd }
+                        required
                         onChange={ (e) => {
                             setDateEnd(e.target.value)
-                        } }/>
-                </div>
-                <div className={ classes['input-parent'] }>
-                    <label htmlFor="price">Price</label>
-                    <input
-                        type="text"
-                        name="price"
-                        value={ price }
-                        onChange={ (e) => {
-                            setPrice(e.target.value)
                         } }/>
                 </div>
                 <div className={ classes['button-wrapper'] }>

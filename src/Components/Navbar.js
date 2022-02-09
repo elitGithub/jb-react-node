@@ -23,6 +23,11 @@ export const Navbar = () => {
 
     }, [user]);
 
+    const logOut = (e) => {
+        e.preventDefault();
+        dispatch((logout()));
+    }
+
     return (<Fragment>
         <div className={ classes.topNav }>
             { loggedIn && isAdmin && <Link to='/admin-panel'>
@@ -34,7 +39,7 @@ export const Navbar = () => {
             { loggedIn && <Link to={ '/vacation-list' }>
                 Vacation List
             </Link> }
-            { loggedIn && <Link to={ '/login' } onClick={ () => dispatch((logout())) }>
+            { loggedIn && <Link to={ '/login' } onClick={ logOut }>
                 Logout
             </Link> }
             { !loggedIn && <Link to={ '/login' }>
@@ -43,6 +48,10 @@ export const Navbar = () => {
             { !loggedIn && <Link to={ '/register' }>
                 Register
             </Link> }
+            { loggedIn && <div className={ classes['topnav-right'] }>
+                <a className={classes['user-greeting']}>Hello, {user.firstName} {user.lastName}</a>
+            </div> }
+
         </div>
     </Fragment>);
 

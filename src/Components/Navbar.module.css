@@ -25,3 +25,15 @@
     background-color: #04AA6D;
     color: white;
 }
+
+.topnav-right {
+    float: right;
+}
+
+.user-greeting {
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+

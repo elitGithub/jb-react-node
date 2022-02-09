@@ -45,6 +45,12 @@
     margin-bottom: 6px;
 }
 
+.dates {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
 .input-parent input:hover {
     background: #404040;
 }

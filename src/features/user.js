@@ -70,6 +70,7 @@ export const userSlice = createSlice({
     reducers: {
         logout: (state, action) => {
             localStorage.removeItem('token');
+            tokenService.hasToken = false;
             return {
                 ...state,
                 value: initialStateValue
