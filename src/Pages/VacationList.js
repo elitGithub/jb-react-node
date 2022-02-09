@@ -7,9 +7,10 @@ import { Navigate } from "react-router-dom";
 import vacationService from "../services/vacationService";
 
 
-const VacationList = () => {
+const VacationList = props => {
     const user = useSelector((state) => state.user.value);
     const [vacationList, setVacationList] = useState([]);
+    const [reloadVacations, setReloadVacations] = useState(true);
 
     const vacationRemoveHandler = (id) => {
         console.log(id);
@@ -18,21 +19,25 @@ const VacationList = () => {
         console.log(id);
     };
 
-    const fetchVacationsList = async () => {
-        const response = await vacationService.list();
-        if (response.hasOwnProperty('success') === response.success) {
-            await setVacationList(response.data);
-        }
-
-    }
 
     useEffect(() => {
-        fetchVacationsList();
-    }, [])
+        const fetchVacationsList = async () => {
+            const response = await vacationService.list();
+            if (response.hasOwnProperty('success') && response.success === true) {
+                await setVacationList(response.data);
+            }
+
+        }
+        if (reloadVacations) {
+            fetchVacationsList();
+        }
+
+        return () => setReloadVacations(false);
+    }, [reloadVacations])
 
     return (<Fragment>
         { user && !user.loggedIn && <Navigate to="/login"/> }
-        <div className={ classes.container }>
+        { vacationList && <div className={ classes.container }>
             { vacationList.map((vacation) => {
                 return <Vacation
                     key={ vacation._id }
@@ -46,7 +51,7 @@ const VacationList = () => {
                     onRemove={ vacationRemoveHandler.bind(null, vacation.id) }
                 />
             }) }
-        </div>
+        </div> }
 
     </Fragment>);
 }

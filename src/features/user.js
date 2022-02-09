@@ -3,12 +3,13 @@ import UsersService from "../services/usersService";
 import loginService from "../services/loginService";
 import LoginService from "../services/loginService";
 import ROLES from "../shared/roles";
+import { tokenService } from "../services/tokenService";
 
 const initialStateValue = {
     firstName: '',
     lastName: '',
     email: '',
-    loggedIn: false,
+    loggedIn: tokenService.hasToken,
     token: '',
     isAdmin: false
 };

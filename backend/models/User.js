@@ -53,7 +53,7 @@ const create = async (req, res) => {
 }
 
 const userAuth = async (req, res) => {
-    const authenticate = User.authenticate();
+    const authenticate = await User.authenticate();
     authenticate(req.body.userName, req.body.password, (err, result) => {
         if (err) {
             return res.status(401).json({ success: false, message: err })

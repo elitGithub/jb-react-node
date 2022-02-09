@@ -20,5 +20,5 @@ export const validateAndMatchPasswords = (password, confirmPass) => {
 };
 
 export const validateAlphanumeric = (string) =>  {
-    return /^[\w\-\s]+$/.test(string);
+    return string && string.length > 0 && /^[\w\-\s]+$/.test(string);
 }
