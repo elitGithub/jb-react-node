@@ -32,3 +32,4 @@ backend/logs/
 *.log
 dev.env
 prod.env
+uploads/

@@ -7,6 +7,7 @@ import { validateAlphanumeric, validateNumbers } from "../shared/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faInfoCircle, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { createVacation } from "../features/vacation";
+import fileService from "../services/fileService";
 
 const CreateEditVacation = props => {
     const user = useSelector((state) => state.user.value);
@@ -36,17 +37,23 @@ const CreateEditVacation = props => {
     const [dateEnd, setDateEnd] = useState('');
     // Dates
 
+    // File
+    const [file, setFile] = useState('');
+
     const [price, setPrice] = useState('');
     const [validPrice, setValidPrice] = useState(false);
+    const [priceFocus, setPriceFocus] = useState(false);
 
     const [errMessage, setErrMessage] = useState('');
 
     useEffect(() => {
         setName(props.name ?? '');
         setDescription(props.description ?? '');
+        setPrice(props.price ?? '');
         setImage(props.image ?? '');
         setDateStart(props.dateStart ?? '');
         setDateEnd(props.dateEnd ?? '');
+        setErrMessage('');
     }, [props])
 
 
@@ -73,14 +80,22 @@ const CreateEditVacation = props => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        if (!name || !description || !image || !dateStart || !dateEnd || !price) {
+
+        const fileUpload = await fileService.upload(file);
+
+        console.log(fileUpload);
+        if (fileUpload.hasOwnProperty('success') && fileUpload.success === true) {
+            setImageUrl(fileUpload.link);
+        } else {
+            setErrMessage('An error has occurred during file upload.');
+            return;
+        }
+        if (!name || !description || !imageUrl || !dateStart || !dateEnd || !price) {
             setErrMessage('All fields are required.')
             return;
         }
 
-        // TODO: handle file upload first (if not using image url option).
-
-        const result = await dispatch(createVacation({ name, description, image, dateStart, dateEnd, price }));
+        const result = await dispatch(createVacation({ name, description, imageUrl, dateStart, dateEnd, price }));
         // if (resUser.meta.requestStatus === 'rejected')
         if (result.meta.requestStatus === 'rejected') {
             setErrMessage(result.payload.message ? result.payload.message : 'An error ocurred');
@@ -92,8 +107,18 @@ const CreateEditVacation = props => {
             errRef.current.focus();
         }
     }
+
+
+    const uploadFile = (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+        setFile(file);
+    }
+
     return (<Modal>
-            { user.isAdmin && <form onSubmit={ onSubmit }>
+            { user.isAdmin && <form onSubmit={ onSubmit } >
                 <p ref={ errRef } className={ errMessage ? "errorMessage" : "offScreen" }
                    aria-live="assertive">{ errMessage }</p>
                 <h2>{ props.title }</h2>
@@ -156,9 +181,17 @@ const CreateEditVacation = props => {
                         name="price"
                         value={ price }
                         required
+                        aria-describedby="pricenote"
                         onChange={ (e) => {
                             setPrice(e.target.value)
-                        } }/>
+                        } }
+                        onFocus={ () => setPriceFocus(true) }
+                        onBlur={ () => setPriceFocus(false) }/>
+                    <p id="pricenote"
+                       className={ priceFocus && price && !validPrice ? classes.instructions : "offScreen" }>
+                        <FontAwesomeIcon icon={ faInfoCircle }/>
+                        Must be numbers only.
+                    </p>
                 </div>
                 { imageUrl && <div className={ classes['input-parent'] }>
                     <label htmlFor="image-link">Image URL</label>
@@ -176,11 +209,8 @@ const CreateEditVacation = props => {
                     <input
                         type="file"
                         name="image-link"
-                        value={ image }
                         required
-                        onChange={ (e) => {
-                            setImage(e.target.value)
-                        } }/>
+                        onChange={ uploadFile }/>
                 </div> }
                 <div className={ classes['input-parent'] }>
                     <label htmlFor="dateStart">Date Start</label>
