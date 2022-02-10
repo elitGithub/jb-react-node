@@ -20,31 +20,17 @@ export const followVacation = createAsyncThunk('vacations/follow', async (id, th
 
 export const createVacation = createAsyncThunk('vacations/create', async (vacation, thunk) => {
     const res = await vacationService.create(vacation);
-});
-
-/*
-
-export const register = createAsyncThunk('users/register', async (user, thunk) => {
-    try {
-        const res = await UsersService.register({ userName: user.email, password: user.password, firstName: user.firstName, lastName: user.lastName });
-        const token = await res.data.token;
-        if (res.hasOwnProperty('success') && res.success === true) {
-            user.token = token;
-            return user;
+    if (res.hasOwnProperty('success') && res.success === true) {
+        const response = await vacationService.list();
+        if (response.hasOwnProperty('success') && response.success === true) {
+            return response;
         } else {
-            return thunk.rejectWithValue(res.hasOwnProperty('message') ? res.message : 'An error occurred during registration.');
+            return thunk.rejectWithValue(res.hasOwnProperty('message') ? res.message : 'Could not get vacation list.');
         }
-    } catch (err) {
-        let error = err; // cast the error for access
-        if (!error.response) {
-            throw err;
-        }
-        return thunk.rejectWithValue(error.response.data);
+    } else {
+        return thunk.rejectWithValue(res.hasOwnProperty('message') ? res.message : 'An error occurred during vacation creation.');
     }
-
 });
- */
-
 
 export const listVacations = createAsyncThunk('vacations/list', async () => {
     const res = await vacationService.list();

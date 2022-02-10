@@ -64,11 +64,19 @@ const CreateEditVacation = props => {
 
     useEffect(() => {
         setErrMessage('');
+        if (name.length < 3) {
+            setValidName(false);
+            return;
+        }
         setValidName(validateAlphanumeric(name));
     }, [name]);
 
     useEffect(() => {
         setErrMessage('');
+        if (description.length < 3) {
+            setValidDesc(false);
+            return;
+        }
         setValidDesc(validateAlphanumeric(description));
     }, [description]);
 
@@ -76,6 +84,10 @@ const CreateEditVacation = props => {
         setErrMessage('');
         setValidPrice(validateNumbers(price));
     }, [price]);
+
+    useEffect(() => {
+        setImageUrl(file.name)
+    }, [imageUrl]);
 
 
     const closeModal = () => {
@@ -85,35 +97,35 @@ const CreateEditVacation = props => {
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        if (!imageUrl && file) {
+        if (file) {
             const fileUpload = await fileService.upload(file);
             if (!fileUpload.hasOwnProperty('success') || fileUpload.success !== true) {
                 setErrMessage('An error has occurred during file upload.');
                 return;
             }
-            setImageUrl(fileUpload.data.name);
+            await setImageUrl(fileUpload.data.name);
         }
 
         if (!name || !description || !imageUrl || !dateStart || !dateEnd || !price) {
             setErrMessage('All fields are required.')
             switch (true) {
                 case !name:
-                    setErrMessage('name is missing');
+                    setErrMessage('Vacation name is missing.');
                     break;
                 case !description:
-                    setErrMessage('description is missing');
+                    setErrMessage('Vacation description is missing.');
                     break;
                 case !imageUrl:
-                    setErrMessage('imageUrl is missing');
+                    setErrMessage('Vacation image is missing.');
                     break;
                 case !dateStart:
-                    setErrMessage('dateStart is missing');
+                    setErrMessage('No start date.');
                     break;
                 case !dateEnd:
-                    setErrMessage('dateEnd is missing');
+                    setErrMessage('No end date.');
                     break;
                 case !price:
-                    setErrMessage('price is missing');
+                    setErrMessage('No price.');
                     break;
             }
             return;
@@ -125,28 +137,30 @@ const CreateEditVacation = props => {
 
     const newVacation = async () => {
         const result = await dispatch(createVacation({ name, description, imageUrl, dateStart, dateEnd, price }));
-        // if (resUser.meta.requestStatus === 'rejected')
         if (result.meta.requestStatus === 'rejected') {
             setErrMessage(result.payload.message ? result.payload.message : 'An error ocurred');
             errRef.current.focus();
         } else if (result.meta.requestStatus === "fulfilled") {
-
+            closeModal();
         } else if (!result.meta.requestStatus) {
             setErrMessage('An error occurred');
             errRef.current.focus();
         }
     }
-    const uploadFile = async (e) => {
+    const validateFile = async (e) => {
         setErrMessage('');
         const file = e.target.files[0];
         if (!file) {
             return;
         }
-        setFile(file);
         if (!fileService.validate(file)) {
             setErrMessage('Unsupported file type.');
             setFile(null);
+            return;
         }
+
+        await setFile(file);
+        await setImageUrl(file.name);
     }
 
     return (<Modal>
@@ -242,7 +256,7 @@ const CreateEditVacation = props => {
                         type="file"
                         name="image-link"
                         required
-                        onChange={ uploadFile }/>
+                        onChange={ validateFile }/>
                 </div> }
                 <div className={ classes['input-parent'] }>
                     <label htmlFor="dateStart">Date Start</label>

@@ -23,8 +23,6 @@ const FileService = {
             'image/jfif',
             'image/tiff',
         ];
-        console.log(file.type);
-        console.log(allowedMimeTypes.indexOf(file.type));
         return allowedMimeTypes.indexOf(file.type) >= 0;
     }
 }

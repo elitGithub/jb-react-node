@@ -9,6 +9,7 @@ import vacationService from "../services/vacationService";
 
 const VacationList = props => {
     const user = useSelector((state) => state.user.value);
+    const vacation = useSelector((state) => state.vacation.value);
     const [vacationList, setVacationList] = useState([]);
     const [reloadVacations, setReloadVacations] = useState(true);
 
@@ -19,6 +20,13 @@ const VacationList = props => {
         console.log(id);
     };
 
+    useEffect(() => {
+        const refreshVacationList = async () => {
+            await setVacationList(vacation.data);
+        }
+
+        refreshVacationList();
+    }, [vacation])
 
     useEffect(() => {
         const fetchVacationsList = async () => {
@@ -33,7 +41,7 @@ const VacationList = props => {
         }
 
         return () => setReloadVacations(false);
-    }, [reloadVacations])
+    }, [reloadVacations]);
 
     return (<Fragment>
         { user && !user.loggedIn && <Navigate to="/login"/> }
