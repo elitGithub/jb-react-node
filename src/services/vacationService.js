@@ -2,16 +2,24 @@ import axios from './axios';
 import { tokenService } from "./tokenService";
 
 const VacationService = {
+    create: async (vacation) => {
+        const token = tokenService.getToken();
+        const response = await axios.post('/api/vacations/vacation', vacation, {
+            withCredentials: true,
+            headers: { 'Content-Type': 'application/json', "Authorization": `Bearer ${ token }` },
+        });
+        return await response.data;
+    },
     list: async () => {
         const token = tokenService.getToken();
         const response = await axios.get(`/api/vacations/vacation-list`,
-            { withCredentials: true, headers: { 'Content-Type': 'application/json', "Authorization": `Bearer ${token}` }, });
+            { withCredentials: true, headers: { 'Content-Type': 'application/json', "Authorization": `Bearer ${ token }` }, });
         return await response.data;
     },
     follow: async (id) => {
         const token = tokenService.getToken();
         const response = await axios.get(`/api/vacations/vacation-follow/${ id }`,
-            { withCredentials: true, headers: { 'Content-Type': 'application/json', "Authorization": `Bearer ${token}` }, });
+            { withCredentials: true, headers: { 'Content-Type': 'application/json', "Authorization": `Bearer ${ token }` }, });
         return await response.data;
     }
 };

@@ -7,7 +7,7 @@ const session = require('express-session');
 const passport = require('passport');
 
 const port = process.env.PORT || 3006;
-const { requestLogger, errorsLogger, logEvents } = require('./middleware/logEvents');
+const { requestLogger, errorsLogger } = require('./middleware/logEvents');
 const rootRouter = require('./routes/root');
 const usersRouter = require('./routes/users');
 const vacationsRouter = require('./routes/vacations');

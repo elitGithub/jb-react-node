@@ -19,7 +19,7 @@ export const followVacation = createAsyncThunk('vacations/follow', async (id, th
 });
 
 export const createVacation = createAsyncThunk('vacations/create', async (vacation, thunk) => {
-    console.log(vacation);
+    const res = await vacationService.create(vacation);
 });
 
 /*

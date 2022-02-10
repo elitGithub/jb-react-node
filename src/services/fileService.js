@@ -3,7 +3,6 @@ import { tokenService } from "./tokenService";
 
 const FileService = {
     upload: async (file) => {
-        console.log(file);
         const token = tokenService.getToken();
         const formData = new FormData();
 
@@ -14,6 +13,19 @@ const FileService = {
         });
 
         return await result.data;
+    },
+    validate: (file) => {
+        const allowedMimeTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'image/bmp',
+            'image/jfif',
+            'image/tiff',
+        ];
+        console.log(file.type);
+        console.log(allowedMimeTypes.indexOf(file.type));
+        return allowedMimeTypes.indexOf(file.type) >= 0;
     }
 }
 

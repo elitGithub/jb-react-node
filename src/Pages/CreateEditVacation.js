@@ -30,6 +30,7 @@ const CreateEditVacation = props => {
     // Vacation Image
     const [image, setImage] = useState('');
     const [imageUrl, setImageUrl] = useState('');
+    const [directLink, setDirectLink] = useState(false);
     // Vacation Image
 
     // Dates
@@ -50,7 +51,7 @@ const CreateEditVacation = props => {
         setName(props.name ?? '');
         setDescription(props.description ?? '');
         setPrice(props.price ?? '');
-        setImage(props.image ?? '');
+        setImageUrl(props.image ?? '');
         setDateStart(props.dateStart ?? '');
         setDateEnd(props.dateEnd ?? '');
         setErrMessage('');
@@ -62,14 +63,17 @@ const CreateEditVacation = props => {
     }, []);
 
     useEffect(() => {
+        setErrMessage('');
         setValidName(validateAlphanumeric(name));
     }, [name]);
 
     useEffect(() => {
+        setErrMessage('');
         setValidDesc(validateAlphanumeric(description));
     }, [description]);
 
     useEffect(() => {
+        setErrMessage('');
         setValidPrice(validateNumbers(price));
     }, [price]);
 
@@ -81,20 +85,45 @@ const CreateEditVacation = props => {
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        const fileUpload = await fileService.upload(file);
-
-        console.log(fileUpload);
-        if (fileUpload.hasOwnProperty('success') && fileUpload.success === true) {
-            setImageUrl(fileUpload.link);
-        } else {
-            setErrMessage('An error has occurred during file upload.');
-            return;
+        if (!imageUrl && file) {
+            const fileUpload = await fileService.upload(file);
+            if (!fileUpload.hasOwnProperty('success') || fileUpload.success !== true) {
+                setErrMessage('An error has occurred during file upload.');
+                return;
+            }
+            setImageUrl(fileUpload.data.name);
         }
+
         if (!name || !description || !imageUrl || !dateStart || !dateEnd || !price) {
             setErrMessage('All fields are required.')
+            switch (true) {
+                case !name:
+                    setErrMessage('name is missing');
+                    break;
+                case !description:
+                    setErrMessage('description is missing');
+                    break;
+                case !imageUrl:
+                    setErrMessage('imageUrl is missing');
+                    break;
+                case !dateStart:
+                    setErrMessage('dateStart is missing');
+                    break;
+                case !dateEnd:
+                    setErrMessage('dateEnd is missing');
+                    break;
+                case !price:
+                    setErrMessage('price is missing');
+                    break;
+            }
             return;
         }
 
+        await newVacation();
+    }
+
+
+    const newVacation = async () => {
         const result = await dispatch(createVacation({ name, description, imageUrl, dateStart, dateEnd, price }));
         // if (resUser.meta.requestStatus === 'rejected')
         if (result.meta.requestStatus === 'rejected') {
@@ -107,18 +136,21 @@ const CreateEditVacation = props => {
             errRef.current.focus();
         }
     }
-
-
-    const uploadFile = (e) => {
+    const uploadFile = async (e) => {
+        setErrMessage('');
         const file = e.target.files[0];
         if (!file) {
             return;
         }
         setFile(file);
+        if (!fileService.validate(file)) {
+            setErrMessage('Unsupported file type.');
+            setFile(null);
+        }
     }
 
     return (<Modal>
-            { user.isAdmin && <form onSubmit={ onSubmit } >
+            { user.isAdmin && <form onSubmit={ onSubmit }>
                 <p ref={ errRef } className={ errMessage ? "errorMessage" : "offScreen" }
                    aria-live="assertive">{ errMessage }</p>
                 <h2>{ props.title }</h2>
@@ -144,7 +176,7 @@ const CreateEditVacation = props => {
                     <p id="namenote"
                        className={ nameFocus && name && !validName ? classes.instructions : "offScreen" }>
                         <FontAwesomeIcon icon={ faInfoCircle }/>
-                        Fill a fun name for the new vacation.
+                        English letters and numbers only.
                     </p>
                 </div>
                 <div className={ classes['input-parent'] }>
@@ -193,7 +225,7 @@ const CreateEditVacation = props => {
                         Must be numbers only.
                     </p>
                 </div>
-                { imageUrl && <div className={ classes['input-parent'] }>
+                { directLink && <div className={ classes['input-parent'] }>
                     <label htmlFor="image-link">Image URL</label>
                     <input
                         type="text"
@@ -204,7 +236,7 @@ const CreateEditVacation = props => {
                             setImageUrl(e.target.value)
                         } }/>
                 </div> }
-                { !imageUrl && <div className={ classes['input-parent'] }>
+                { !directLink && <div className={ classes['input-parent'] }>
                     <label htmlFor="image-link">Upload File</label>
                     <input
                         type="file"
@@ -235,7 +267,7 @@ const CreateEditVacation = props => {
                         } }/>
                 </div>
                 <div className={ classes['button-wrapper'] }>
-                    <button className="login-btn" type="submit">Create</button>
+                    <button className="login-btn" disabled={ errMessage !== '' } type="submit">Create</button>
                     <button className="login-btn" onClick={ closeModal }>Cancel</button>
                 </div>
             </form> }

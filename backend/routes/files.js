@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
+
 router.route('/')
     .get((req, res) => {})
     .post(async (req, res) => {
