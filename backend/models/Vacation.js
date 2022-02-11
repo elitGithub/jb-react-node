@@ -1,14 +1,13 @@
 const mongoose = require('mongoose');
 const logger = require('../middleware/logEvents');
 const vacationSchema = require('../db/VacationSchema');
-const userUtils = require("../middleware/userUtils");
+const userUtils = require("../utils/userUtils");
 
 const Vacation = mongoose.model('Vacation', vacationSchema);
 
 const list = async (req, res) => {
     try {
-        const vacations = await Vacation.find({});
-        res.json({ success: true, message: '', data: vacations });
+        return await Vacation.find({}).lean();
     } catch (e) {
         await logger.logErrors(e);
         return res.json({ success: false, message: e, data: {} });

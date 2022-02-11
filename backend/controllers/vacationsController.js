@@ -1,12 +1,18 @@
 const Vacation = require('../models/Vacation');
-const jwtUtils = require("../middleware/jwtUtils");
-
+const jwtUtils = require("../utils/jwtUtils");
+const fileUtils = require("../utils/fileUtils");
 
 const list = async (req, res) => {
     const authHeader = req.headers?.authorization || req.headers?.Authorization;
     const authorized = await jwtUtils.validate(authHeader);
     if (authorized) {
-        return await Vacation.list(req, res);
+        let vacations = await Vacation.list(req, res);
+        vacations = Promise.all(await vacations.map(async vacation => {
+            vacation.imageUrl = await fileUtils.createPublicUrl(vacation.imageUrl);
+            return vacation;
+        }));
+
+        return res.json({ success: true, message: '', data: await vacations });
     } else {
         return res.sendStatus(403);
     }

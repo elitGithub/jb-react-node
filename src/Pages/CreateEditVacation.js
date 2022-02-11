@@ -85,10 +85,6 @@ const CreateEditVacation = props => {
         setValidPrice(validateNumbers(price));
     }, [price]);
 
-    useEffect(() => {
-        setImageUrl(file.name)
-    }, [imageUrl]);
-
 
     const closeModal = () => {
         dispatch(showHide({ isShown: false }));
@@ -97,6 +93,7 @@ const CreateEditVacation = props => {
     const onSubmit = async (e) => {
         e.preventDefault();
 
+        let newFile = imageUrl;
         if (file) {
             const fileUpload = await fileService.upload(file);
             if (!fileUpload.hasOwnProperty('success') || fileUpload.success !== true) {
@@ -104,8 +101,10 @@ const CreateEditVacation = props => {
                 return;
             }
             await setImageUrl(fileUpload.data.name);
+            newFile = fileUpload.data.name;
         }
 
+        console.log(imageUrl);
         if (!name || !description || !imageUrl || !dateStart || !dateEnd || !price) {
             setErrMessage('All fields are required.')
             switch (true) {
@@ -131,12 +130,12 @@ const CreateEditVacation = props => {
             return;
         }
 
-        await newVacation();
+        await newVacation(newFile);
     }
 
 
-    const newVacation = async () => {
-        const result = await dispatch(createVacation({ name, description, imageUrl, dateStart, dateEnd, price }));
+    const newVacation = async (newFile) => {
+        const result = await dispatch(createVacation({ name, description, imageUrl: newFile, dateStart, dateEnd, price }));
         if (result.meta.requestStatus === 'rejected') {
             setErrMessage(result.payload.message ? result.payload.message : 'An error ocurred');
             errRef.current.focus();

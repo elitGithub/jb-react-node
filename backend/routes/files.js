@@ -1,22 +1,9 @@
 const express = require('express');
+const filesController = require("../controllers/filesController");
 const router = express.Router();
 
 router.route('/')
     .get((req, res) => {})
-    .post(async (req, res) => {
-        // Input must be named file.
-        const file = req.files.file;
-        await file.mv(`./uploads/${file.name}`);
-        res.json({
-            success: true,
-            message: 'File is uploaded',
-            data: {
-                name: file.name,
-                mimetype: file.mimetype,
-                size: file.size,
-                link: `uploads/${file.name}`
-            }
-        });
-    });
+    .post(async (req, res) =>  await filesController.upload(req, res));
 
 module.exports = router;

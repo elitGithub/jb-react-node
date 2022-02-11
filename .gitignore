@@ -33,3 +33,4 @@ backend/logs/
 dev.env
 prod.env
 uploads/
+google-cloud-key.*

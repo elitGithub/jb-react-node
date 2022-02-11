@@ -51,7 +51,7 @@ const VacationList = props => {
                     key={ vacation._id }
                     name={ vacation.name }
                     description={ vacation.description }
-                    image={ vacation.image }
+                    image={ vacation.imageUrl }
                     dateStart={ vacation.dateStart }
                     dateEnd={ vacation.dateEnd }
                     price={ vacation.price }

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const passport = require("passport");
 const ROLES = require("../shared/roles");
-const jwtUtils = require("../middleware/jwtUtils");
+const jwtUtils = require("../utils/jwtUtils");
 const userSchema = require('../db/UserSchema');
 
 const User = mongoose.model('User', userSchema);

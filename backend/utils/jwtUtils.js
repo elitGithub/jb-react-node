@@ -1,13 +1,10 @@
 const auth_hdr = require("passport-jwt/lib/auth_header");
 const jwt = require("jsonwebtoken");
-const logEvents = require("./logEvents");
-const mongoose = require("mongoose");
-const userSchema = require("../db/UserSchema");
+const logEvents = require("../middleware/logEvents");
 
 const AUTH_HEADER = "authorization";
 const LEGACY_AUTH_SCHEME = "JWT";
 const BEARER_AUTH_SCHEME = 'bearer';
-
 
 const extractToken = (request) => {
     const auth_scheme_lower = BEARER_AUTH_SCHEME.toLowerCase();

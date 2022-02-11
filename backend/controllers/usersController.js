@@ -1,7 +1,7 @@
 const logEvents = require('../middleware/logEvents');
 const User = require("../models/User");
-const jwtUtils = require("../middleware/jwtUtils");
-const userUtils = require("../middleware/userUtils");
+const jwtUtils = require("../utils/jwtUtils");
+const userUtils = require("../utils/userUtils");
 
 const register = async (req, res) => {
     if (!req.body.password || !req.body.userName) {
