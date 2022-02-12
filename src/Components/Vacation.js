@@ -12,16 +12,19 @@ const Vacation = (props) => {
     const [loggedIn, setLoggedIn] = useState(false);
 
     useEffect(() => {
+        setLoggedIn(user && user.loggedIn);
+        setIsAdmin(user && user.isAdmin && user.loggedIn);
+
+    }, [user]);
+
+    useEffect(() => {
         setIsAdmin(user?.isAdmin);
     }, [user]);
 
     useEffect(() => {
-        setLoggedIn(user?.loggedIn);
-    }, [user]);
-
-
-    useEffect(() => {
-        setIsFollowed((user.followedVacations.indexOf(props.id) > -1));
+        if (user?.followedVacations) {
+            setIsFollowed((user?.followedVacations.indexOf(props.id) > -1));
+        }
     }, [user]);
 
     const tagClasses = [
@@ -68,7 +71,7 @@ const Vacation = (props) => {
                 <div className={ classes['card-body'] }>
                     <h5>{ dateStart.toDateString() } - { dateEnd.toDateString() }</h5>
                     <img src={ props.imageUrl }
-                         alt="vacation photo"/>
+                         alt="vacation"/>
                 </div>
             </div>
         </Fragment>

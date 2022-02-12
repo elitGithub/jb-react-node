@@ -25,10 +25,9 @@ export const Navbar = () => {
 
     const logOut = async (e) => {
         e.preventDefault();
+        setLoggedIn(false);
+        setIsAdmin(false);
         await dispatch((logout()));
-        await setLoggedIn(false);
-        await setIsAdmin(false);
-        return <Navigate to="/login"/>;
     }
 
     return (<Fragment>

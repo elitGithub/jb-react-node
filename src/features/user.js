@@ -9,7 +9,7 @@ const initialStateValue = {
     firstName: '',
     lastName: '',
     email: '',
-    loggedIn: tokenService.hasToken,
+    loggedIn: tokenService.hasToken(),
     token: '',
     isAdmin: false
 };
@@ -70,10 +70,16 @@ export const userSlice = createSlice({
     reducers: {
         logout: (state, action) => {
             localStorage.removeItem('token');
-            tokenService.hasToken = false;
             return {
                 ...state,
-                value: initialStateValue
+                value:  {
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    loggedIn: false,
+                    token: '',
+                    isAdmin: false
+                }
             }
         },
     },
