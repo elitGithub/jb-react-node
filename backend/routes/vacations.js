@@ -8,6 +8,7 @@ router.route('/vacation-list(.html)?')
 
 router.route('/vacation-follow(.html)?/:id?')
     .get((req, res) => vacationsController.follow(req, res))
+    .delete((req, res) => vacationsController.unfollow(req, res))
     .post();
 
 router.route('/vacation(.html)?/:id?')

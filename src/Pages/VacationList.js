@@ -58,6 +58,7 @@ const VacationList = props => {
             { vacationList.map((vacation) => {
                 return <Vacation
                     key={ vacation._id }
+                    id={ vacation._id }
                     name={ vacation.name }
                     description={ vacation.description }
                     imageUrl={ vacation.imageUrl }

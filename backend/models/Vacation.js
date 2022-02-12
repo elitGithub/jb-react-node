@@ -58,6 +58,25 @@ const follow = async (req, res) => {
     return res.json({ success: true, message: '', data: {} });
 };
 
+const unfollow = async (req, res) => {
+    const vacation = await Vacation.findOne({ _id: req.params.id });
+    if (!vacation) {
+        return res.json({ success: false, message: 'No such entity.', data: {} });
+    }
+
+    const user = await userUtils.userFromToken(req);
+    if (user) {
+        const index = user.followedVacations.indexOf(req.params.id);
+        if (index < 0) {
+            return res.json({ success: true, message: 'This vacation is not followed', data: {} });
+        }
+        user.followedVacations.splice(index, 1);
+        user.save();
+    }
+
+    return res.json({ success: true, message: '', data: {} });
+};
+
 const update = async (req, res) => {
     if (!req.params.id) {
         return res.json({ success: false, message: 'Missing required parameter id.', data: {} });
@@ -82,4 +101,4 @@ const update = async (req, res) => {
     }
 };
 
-module.exports = { Vacation, create, update, list, readOne, follow, deleteVacation };
+module.exports = { Vacation, create, update, list, readOne, follow, unfollow, deleteVacation };

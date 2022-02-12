@@ -1,10 +1,12 @@
 import { Fragment, useEffect, useState } from "react";
 import classes from "./Vacation.module.css";
 import { DeleteOutline, EditOutlined } from "@mui/icons-material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { followVacation, unfollowVacation } from "../features/vacation";
 
 const Vacation = (props) => {
     const user = useSelector((state) => state.user.value);
+    const dispatch = useDispatch();
     const [isFollowed, setIsFollowed] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [loggedIn, setLoggedIn] = useState(false);
@@ -14,7 +16,12 @@ const Vacation = (props) => {
     }, [user]);
 
     useEffect(() => {
-        setLoggedIn(user?.loggedIn)
+        setLoggedIn(user?.loggedIn);
+    }, [user]);
+
+
+    useEffect(() => {
+        setIsFollowed((user.followedVacations.indexOf(props.id) > -1));
     }, [user]);
 
     const tagClasses = [
@@ -26,9 +33,13 @@ const Vacation = (props) => {
         isFollowed ? classes['tag-purple'] : classes['tag-grey'],
     ];
 
-    const followOrUnfollow = (e) => {
+    const followOrUnfollow = () => {
+        if (isFollowed) {
+            dispatch(unfollowVacation(props.id));
+        } else {
+            dispatch(followVacation(props.id));
+        }
         setIsFollowed(!isFollowed);
-        console.log(e.target);
     }
 
     let followText = isFollowed ? 'Unfollow' : 'Follow';

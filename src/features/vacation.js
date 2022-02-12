@@ -18,6 +18,23 @@ export const followVacation = createAsyncThunk('vacations/follow', async (id, th
     }
 });
 
+export const unfollowVacation = createAsyncThunk('vacations/unfollow', async (id, thunk) => {
+    try {
+        const res = await vacationService.unfollow(id);
+        if (res.hasOwnProperty('success') && res.success === true) {
+            return res.data;
+        } else {
+            return thunk.rejectWithValue(res.hasOwnProperty('message') ? res.message : 'An error occurred during registration.');
+        }
+    } catch (err) {
+        let error = err; // cast the error for access
+        if (!error.response) {
+            throw err;
+        }
+        return thunk.rejectWithValue(error.response.data);
+    }
+});
+
 const vacationList = async () => {
     const response = await vacationService.list();
     if (response.hasOwnProperty('success') && response.success === true) {

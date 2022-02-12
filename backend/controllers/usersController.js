@@ -37,7 +37,7 @@ const refresh = async (req, res) => {
         return res.json({
             success: true,
             message: "Refresh Successful",
-            data: { token, userName: user.userName, firstName: user.firstName, lastName: user.lastName, role: user.role.join(',') }
+            data: { token, userName: user.userName, firstName: user.firstName, lastName: user.lastName, role: user.role.join(','), followedVacations: user.followedVacations }
         });
     }
 

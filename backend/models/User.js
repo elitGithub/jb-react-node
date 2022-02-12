@@ -78,7 +78,8 @@ const userAuth = async (req, res) => {
                 userName: result.username,
                 firstName: result.firstName,
                 lastName: result.lastName,
-                role: result.role.join(',')
+                role: result.role.join(','),
+                followedVacations: result.followedVacations
             }
         });
     });

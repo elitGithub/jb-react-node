@@ -24,7 +24,6 @@ const Main = () => {
     }, [modal]);
 
     const reload = () => {
-        console.log('reload');
         setListVacations(true);
         return true;
     }

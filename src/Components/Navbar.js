@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import classes from "./Navbar.module.css";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { showHide } from "../features/modal";
 import { logout } from "../features/user";
@@ -28,6 +28,7 @@ export const Navbar = () => {
         await dispatch((logout()));
         await setLoggedIn(false);
         await setIsAdmin(false);
+        return <Navigate to="/login"/>;
     }
 
     return (<Fragment>
@@ -51,7 +52,7 @@ export const Navbar = () => {
                 Register
             </Link> }
             { loggedIn && <div className={ classes['topnav-right'] }>
-                <p className={classes['user-greeting']}>Hello, {user.firstName} {user.lastName}</p>
+                { loggedIn && <p className={ classes['user-greeting'] }>Hello, { user.firstName } { user.lastName }</p> }
             </div> }
 
         </div>
