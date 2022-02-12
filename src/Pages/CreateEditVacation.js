@@ -9,6 +9,7 @@ import { faCheck, faInfoCircle, faTimes } from "@fortawesome/free-solid-svg-icon
 import { createVacation, listVacations, updateVacation } from "../features/vacation";
 import fileService from "../services/fileService";
 import * as moment from 'moment';
+import vacationService from "../services/vacationService";
 
 
 const CreateEditVacation = props => {
@@ -50,19 +51,28 @@ const CreateEditVacation = props => {
     const [priceFocus, setPriceFocus] = useState(false);
 
     const [errMessage, setErrMessage] = useState('');
-    useEffect(() => {
-        setEditMode(false);
-        if (!(Object.keys(modal.vacation).length === 0)) {
-            let startDate = moment(new Date(modal.vacation.dateStart)).format('yyyy-MM-DD');
-            let endDate = moment(new Date(modal.vacation.dateEnd)).format('yyyy-MM-DD');
 
-            setName(modal.vacation.name ?? '');
-            setDescription(modal.vacation.description ?? '');
-            setPrice(modal.vacation.price ?? '');
-            setImageUrl(modal.vacation.imageUrl ?? '');
+    const editingVacation = async () => {
+        const res = await vacationService.one(modal.vacation._id);
+        if (res.hasOwnProperty('success') && res.success === true) {
+            console.log(res.data);
+            let startDate = moment(new Date(res.data.dateStart)).format('yyyy-MM-DD');
+            let endDate = moment(new Date(res.data.dateEnd)).format('yyyy-MM-DD');
+
+            setName(res.data.name ?? '');
+            setDescription(res.data.description ?? '');
+            setPrice(res.data.price ?? '');
+            setImageUrl(res.data.image ?? '');
             setDateStart(startDate ?? '');
             setDateEnd(endDate ?? '');
             setEditMode(true);
+        }
+    }
+
+    useEffect(() => {
+        setEditMode(false);
+        if ((Object.keys(modal.vacation).length > 0)) {
+            editingVacation();
         }
         setErrMessage('');
     }, [modal])
