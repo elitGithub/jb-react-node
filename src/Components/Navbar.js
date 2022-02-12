@@ -11,7 +11,7 @@ export const Navbar = () => {
     const dispatch = useDispatch();
     const addVacation = (e) => {
         e.preventDefault();
-        dispatch(showHide({ isShown: !modal.isShown }));
+        dispatch(showHide(true));
     };
 
     const [loggedIn, setLoggedIn] = useState(false);
@@ -23,9 +23,11 @@ export const Navbar = () => {
 
     }, [user]);
 
-    const logOut = (e) => {
+    const logOut = async (e) => {
         e.preventDefault();
-        dispatch((logout()));
+        await dispatch((logout()));
+        await setLoggedIn(false);
+        await setIsAdmin(false);
     }
 
     return (<Fragment>
@@ -49,7 +51,7 @@ export const Navbar = () => {
                 Register
             </Link> }
             { loggedIn && <div className={ classes['topnav-right'] }>
-                <a className={classes['user-greeting']}>Hello, {user.firstName} {user.lastName}</a>
+                <p className={classes['user-greeting']}>Hello, {user.firstName} {user.lastName}</p>
             </div> }
 
         </div>

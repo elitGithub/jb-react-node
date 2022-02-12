@@ -8,7 +8,7 @@ const list = async (req, res) => {
     if (authorized) {
         let vacations = await Vacation.list(req, res);
         vacations = Promise.all(await vacations.map(async vacation => {
-            vacation.imageUrl = await fileUtils.createPublicUrl(vacation.imageUrl);
+            vacation.imageUrl = await fileUtils.createPublicUrl(vacation.image);
             return vacation;
         }));
 
@@ -38,7 +38,9 @@ const readVacation = async (req, res) => {
         if (!req.params.id) {
             return res.json({ success: false, message: 'Missing required parameter id.', data: {} });
         }
-        return await Vacation.readOne(req, res);
+        const vacation = await Vacation.readOne(req, res);
+        vacation.imageUrl = await fileUtils.createPublicUrl(vacation.image);
+        return res.json({ success: true, message: '', data: await vacation });
     } else {
         return res.sendStatus(403);
     }
@@ -56,6 +58,17 @@ const createVacation = async (req, res) => {
 
 };
 
+const deleteVacation = async (req, res) => {
+    const authHeader = req.headers?.authorization || req.headers?.Authorization;
+    const authorized = await jwtUtils.validate(authHeader);
+    if (authorized) {
+        return await Vacation.deleteVacation(req, res);
+    } else {
+        return res.sendStatus(403);
+    }
+
+};
+
 const updateVacation = async (req, res) => {
     const authHeader = req.headers?.authorization || req.headers?.Authorization;
     const authorized = await jwtUtils.validate(authHeader);
@@ -67,4 +80,4 @@ const updateVacation = async (req, res) => {
 
 };
 
-module.exports = { list, createVacation, readVacation, updateVacation, follow };
+module.exports = { list, createVacation, readVacation, updateVacation, follow, deleteVacation };

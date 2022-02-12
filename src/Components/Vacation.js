@@ -50,10 +50,13 @@ const Vacation = (props) => {
                     <h4 className={ classes['card-content-title'] }>
                         { props.description }
                     </h4>
+                    <div>
+                        For: { props.price } $
+                    </div>
                 </div>
                 <div className={ classes['card-body'] }>
                     <h5>{ dateStart.toDateString() } - { dateEnd.toDateString() }</h5>
-                    <img src={ props.image }
+                    <img src={ props.imageUrl }
                          alt="vacation photo"/>
                 </div>
             </div>

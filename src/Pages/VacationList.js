@@ -2,61 +2,71 @@ import { Fragment, useEffect, useState } from "react";
 import Vacation from "../Components/Vacation";
 import classes from "../Components/Vacation.module.css";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { edit, showHide } from "../features/modal";
+import { deleteVacation, listVacations } from "../features/vacation";
 import vacationService from "../services/vacationService";
 
 
 const VacationList = props => {
     const user = useSelector((state) => state.user.value);
-    const vacation = useSelector((state) => state.vacation.value);
+    const modal = useSelector((state) => state.modal.value);
+    const dispatch = useDispatch();
     const [vacationList, setVacationList] = useState([]);
     const [reloadVacations, setReloadVacations] = useState(true);
+    const [showVacations, setShowVacations] = useState(false);
 
-    const vacationRemoveHandler = (id) => {
-        console.log(id);
-    };
-    const editVacationHandler = (id) => {
-        console.log(id);
-    };
-
-    useEffect(() => {
-        const refreshVacationList = async () => {
-            await setVacationList(vacation.data);
-        }
-
-        refreshVacationList();
-    }, [vacation])
+    const fetchData = async () => {
+        const response = await vacationService.list();
+        setVacationList(response.data);
+    }
 
     useEffect(() => {
-        const fetchVacationsList = async () => {
-            const response = await vacationService.list();
-            if (response.hasOwnProperty('success') && response.success === true) {
-                await setVacationList(response.data);
-            }
-
-        }
-        if (reloadVacations) {
-            fetchVacationsList();
-        }
-
-        return () => setReloadVacations(false);
+        fetchData();
+        setShowVacations(true);
     }, [reloadVacations]);
+
+    useEffect(() => {
+        fetchData();
+        setReloadVacations(true);
+        setShowVacations(true);
+    }, [modal]);
+
+    const vacationRemoveHandler = async (id) => {
+        await dispatch(deleteVacation(id));
+        await dispatch(listVacations());
+        await setReloadVacations(true);
+        if (vacationList.length === 1) {
+            setShowVacations(false);
+        }
+    };
+
+    const editVacationHandler = async (id) => {
+        const vacation = await dispatch(edit(id));
+        if (!(vacation.meta.requestStatus === 'fulfilled')) {
+            alert(vacation.payload.message ? vacation.payload.message : 'Error occurred');
+            return;
+        }
+        await dispatch(showHide(true));
+        await setReloadVacations(true);
+    };
 
     return (<Fragment>
         { user && !user.loggedIn && <Navigate to="/login"/> }
-        { vacationList && <div className={ classes.container }>
+        { showVacations && <div className={ classes.container }>
             { vacationList.map((vacation) => {
                 return <Vacation
                     key={ vacation._id }
                     name={ vacation.name }
                     description={ vacation.description }
-                    image={ vacation.imageUrl }
+                    imageUrl={ vacation.imageUrl }
+                    image={ vacation.image }
                     dateStart={ vacation.dateStart }
                     dateEnd={ vacation.dateEnd }
                     price={ vacation.price }
-                    onEdit={ editVacationHandler.bind(null, vacation.id) }
-                    onRemove={ vacationRemoveHandler.bind(null, vacation.id) }
+                    onEdit={ editVacationHandler.bind(null, vacation._id) }
+                    onRemove={ vacationRemoveHandler.bind(null, vacation._id) }
                 />
             }) }
         </div> }

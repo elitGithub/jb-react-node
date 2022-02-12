@@ -13,6 +13,7 @@ router.route('/vacation-follow(.html)?/:id?')
 router.route('/vacation(.html)?/:id?')
     .get((req, res) => vacationsController.readVacation(req, res))
     .put((req, res) => vacationsController.updateVacation(req, res))
+    .delete((req, res) => vacationsController.deleteVacation(req, res))
     .post((req, res) => vacationsController.createVacation(req, res));
 
 module.exports = router;

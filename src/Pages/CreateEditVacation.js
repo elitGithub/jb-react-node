@@ -6,15 +6,19 @@ import { showHide } from "../features/modal";
 import { validateAlphanumeric, validateNumbers } from "../shared/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faInfoCircle, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { createVacation } from "../features/vacation";
+import { createVacation, listVacations, updateVacation } from "../features/vacation";
 import fileService from "../services/fileService";
+import * as moment from 'moment';
+
 
 const CreateEditVacation = props => {
     const user = useSelector((state) => state.user.value);
+    const modal = useSelector((state) => state.modal.value);
     const dispatch = useDispatch();
     const vacationNameRef = useRef();
     const errRef = useRef();
 
+    const [editMode, setEditMode] = useState(false);
     // vacation Name
     const [name, setName] = useState('');
     const [nameFocus, setNameFocus] = useState(false);
@@ -46,16 +50,22 @@ const CreateEditVacation = props => {
     const [priceFocus, setPriceFocus] = useState(false);
 
     const [errMessage, setErrMessage] = useState('');
-
     useEffect(() => {
-        setName(props.name ?? '');
-        setDescription(props.description ?? '');
-        setPrice(props.price ?? '');
-        setImageUrl(props.image ?? '');
-        setDateStart(props.dateStart ?? '');
-        setDateEnd(props.dateEnd ?? '');
+        setEditMode(false);
+        if (!(Object.keys(modal.vacation).length === 0)) {
+            let startDate = moment(new Date(modal.vacation.dateStart)).format('yyyy-MM-DD');
+            let endDate = moment(new Date(modal.vacation.dateEnd)).format('yyyy-MM-DD');
+
+            setName(modal.vacation.name ?? '');
+            setDescription(modal.vacation.description ?? '');
+            setPrice(modal.vacation.price ?? '');
+            setImageUrl(modal.vacation.imageUrl ?? '');
+            setDateStart(startDate ?? '');
+            setDateEnd(endDate ?? '');
+            setEditMode(true);
+        }
         setErrMessage('');
-    }, [props])
+    }, [modal])
 
 
     useEffect(() => {
@@ -87,12 +97,11 @@ const CreateEditVacation = props => {
 
 
     const closeModal = () => {
-        dispatch(showHide({ isShown: false }));
+        dispatch(showHide(false));
     }
 
     const onSubmit = async (e) => {
         e.preventDefault();
-
         let newFile = imageUrl;
         if (file) {
             const fileUpload = await fileService.upload(file);
@@ -100,11 +109,9 @@ const CreateEditVacation = props => {
                 setErrMessage('An error has occurred during file upload.');
                 return;
             }
-            await setImageUrl(fileUpload.data.name);
             newFile = fileUpload.data.name;
         }
 
-        console.log(imageUrl);
         if (!name || !description || !imageUrl || !dateStart || !dateEnd || !price) {
             setErrMessage('All fields are required.')
             switch (true) {
@@ -130,22 +137,36 @@ const CreateEditVacation = props => {
             return;
         }
 
-        await newVacation(newFile);
+        await setImageUrl(newFile);
+        if (editMode) {
+            await editVacation(newFile);
+        } else {
+            await newVacation(newFile);
+        }
+
+        dispatch(listVacations());
     }
 
+    const editVacation = async (newFile) => {
+        const result = await dispatch(updateVacation({ id: modal.vacation._id, name, description, image: newFile, dateStart, dateEnd, price }));
+        if (!(result.meta.requestStatus === "fulfilled")) {
+            setErrMessage(result.payload.message ? result.payload.message : 'An error occurred');
+            errRef.current.focus();
+            return;
+        }
+        closeModal();
+    }
 
     const newVacation = async (newFile) => {
-        const result = await dispatch(createVacation({ name, description, imageUrl: newFile, dateStart, dateEnd, price }));
-        if (result.meta.requestStatus === 'rejected') {
-            setErrMessage(result.payload.message ? result.payload.message : 'An error ocurred');
+        const result = await dispatch(createVacation({ name, description, image: newFile, dateStart, dateEnd, price }));
+        if (!(result.meta.requestStatus === "fulfilled")) {
+            setErrMessage(result.payload.message ? result.payload.message : 'An error occurred');
             errRef.current.focus();
-        } else if (result.meta.requestStatus === "fulfilled") {
-            closeModal();
-        } else if (!result.meta.requestStatus) {
-            setErrMessage('An error occurred');
-            errRef.current.focus();
+            return;
         }
+        closeModal();
     }
+
     const validateFile = async (e) => {
         setErrMessage('');
         const file = e.target.files[0];
@@ -244,7 +265,6 @@ const CreateEditVacation = props => {
                         type="text"
                         name="image-link"
                         value={ image }
-                        required
                         onChange={ (e) => {
                             setImageUrl(e.target.value)
                         } }/>
@@ -254,7 +274,6 @@ const CreateEditVacation = props => {
                     <input
                         type="file"
                         name="image-link"
-                        required
                         onChange={ validateFile }/>
                 </div> }
                 <div className={ classes['input-parent'] }>
@@ -280,7 +299,7 @@ const CreateEditVacation = props => {
                         } }/>
                 </div>
                 <div className={ classes['button-wrapper'] }>
-                    <button className="login-btn" disabled={ errMessage !== '' } type="submit">Create</button>
+                    <button className="login-btn" disabled={ errMessage !== '' } type="submit">{ editMode ? 'Update' : 'Create'}</button>
                     <button className="login-btn" onClick={ closeModal }>Cancel</button>
                 </div>
             </form> }

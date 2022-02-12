@@ -26,7 +26,16 @@ const create = async (req, res) => {
 
 
 const readOne = async (req, res) => {
-    const vacation = await Vacation.findOne({ _id: req.params.id });
+    try {
+        return await Vacation.findOne({ _id: req.params.id }).lean();
+    } catch (e) {
+        await logger.logErrors(e);
+        return res.json({ success: false, message: e, data: {} });
+    }
+}
+
+const deleteVacation = async (req, res) => {
+    const vacation = await Vacation.findByIdAndDelete({ _id: req.params.id });
     res.json({ success: true, message: '', data: vacation });
 }
 
@@ -73,4 +82,4 @@ const update = async (req, res) => {
     }
 };
 
-module.exports = { Vacation, create, update, list, readOne, follow };
+module.exports = { Vacation, create, update, list, readOne, follow, deleteVacation };

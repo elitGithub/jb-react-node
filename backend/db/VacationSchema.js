@@ -13,7 +13,7 @@ const vacationSchema = new mongoose.Schema({
         minLength: 3,
         validator: v => /[A-Za-z]/.test(v)
     },
-    imageUrl: {
+    image: {
         type: String,
         required: true,
     },
