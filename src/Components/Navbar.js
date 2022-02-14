@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { showHide } from "../features/modal";
 import { logout } from "../features/user";
 
-export const Navbar = () => {
+export const Navbar = (props) => {
     const user = useSelector((state) => state.user.value);
     const modal = useSelector((state) => state.modal.value);
     const dispatch = useDispatch();
@@ -13,6 +13,10 @@ export const Navbar = () => {
         e.preventDefault();
         dispatch(showHide(true));
     };
+
+    const reloadVacations = () => {
+        props.reload();
+    }
 
     const [loggedIn, setLoggedIn] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -38,7 +42,7 @@ export const Navbar = () => {
             { loggedIn && isAdmin && <Link to='/' onClick={ addVacation }>
                 Add Vacation
             </Link> }
-            { loggedIn && <Link to={ '/vacation-list' }>
+            { loggedIn && <Link to={ '/vacation-list' } onClick={ reloadVacations }>
                 Vacation List
             </Link> }
             { loggedIn && <Link to={ '/login' } onClick={ logOut }>

@@ -31,7 +31,7 @@ const Main = () => {
     return (
         <Fragment>
             <Router>
-                <Navbar/>
+                <Navbar reload={reload}/>
                 <Routes>
                     <Route path="/admin-panel" element={ <AdminPanel/> }/>
                     <Route path="/vacation-list" element={ <VacationList reload={reload} listVacations={listVacations} /> }/>
